@@ -1,0 +1,77 @@
+<svg class="logoCthulhu" width="128" height="128" viewBox="0 0 128 128">
+    <g id="all">
+        <g id="outer">
+            <circle
+                cx="64"
+                cy="64"
+                r="60" />
+        </g>
+        <g id="inner" >
+            <path
+                style="stroke-linejoin:bevel;"
+                d="M 6.9366111,45.45899 H 121.06339 L 28.732875,112.54102 64,4 99.267125,112.54102 Z"/>
+            <path
+                d="m 19.975767,71.08204 92.763033,0 -57.064511,41.4598 21.796555,-67.08287 c 8.445674,-25.99313 19.14462,-32.65165 17.585762,-14.96081"/>
+            <path
+                d="m 117.77535,90.61225 c -5.28357,-1.71672 -6.61822,-4.68325 -14.8521,5.97847"/>
+            <path
+                d="M 108.19155,90.73081 64,4 15.458977,99.26712 c 19.052314,-5.10183 34.86033,0.44681 31.686784,9.83724"/>
+        </g>
+        <g id="links">
+            <circle id="link_1"
+                cx="93.225082"
+                cy="32.8452"
+                r="2.9770844" />
+            <circle id="link_2"
+                cx="45.961941"
+                cy="111.91334"
+                r="2.9770844" />
+            <circle id="link_3"
+                cx="17.147339"
+                cy="71.25468"
+                r="2.9770844" />
+        </g>
+    </g>
+    <defs>
+        <style type="text/css">
+            <![CDATA[
+                .logoCthulhu {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) scale(2, 2);
+                    width: 128px;
+                    height: 128px;
+                    transition: all 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                }
+                .logoCthulhu #outer {
+                    fill: none;
+                    pointer-events: all;
+                    stroke-width: 8;
+                    stroke: #000000;
+                    transition: 1000ms;
+                }
+                .logoCthulhu #inner {
+                    fill: none;
+                    stroke-width: 3.5;
+                    stroke: #000000;
+                    transition: 1000ms;
+                }
+                .logoCthulhu #links {
+                    pointer-events: all;
+                    fill: none;
+                    stroke-width: 3.5;
+                    stroke: #000000;
+                    transition: 1000ms;
+                }
+                .logoCthulhu #link_1:hover {
+                    cursor: pointer;
+                }
+                .logoCthulhu #all:hover > g {
+                    stroke: #2d822d;
+                    transition: 1000ms;
+                }
+            ]]>
+        </style>
+    </defs>
+</svg>

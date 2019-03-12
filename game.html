@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      button { border: none; padding: 0.5%; background: #41bb41; height: 100%; }
+      
+      #gamespace { position: fixed; left: 0; top: 0; width: 80%; height: 95%; background: -webkit-radial-gradient(rgba(57,60,76,1), rgba(36,36,46,1) 80%); }
+        #start_button { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40%; height: 10%; }
+        #table_container { display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border:none; width: 90%; height: 90%; background: rgb(220, 220, 220); }
+          #table { position: absolute; top: 0; width: 100%; padding: 5px; overflow: auto; }
+            td, th { border: 1px solid grey; text-align: center; height: 20px; }
+            tbody tr:hover { background-color: azure; }
+          #table_buttons { position: absolute; bottom: 0; width: 100%; height: 5%; padding: 5px; }
+          #table_create { float: left; margin-right: 5px; }
+          #table_join { float: right; }
+        #table_create_form_bg { display: none; z-index: 1; width: 100%; height: 100%; background-color: #000000; background-color: rgba(0,0,0,0.4); }
+          #table_create_form_content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border:none; width: 90%; height: 10%; background-color: black; }
+            #table_create_form { margin: 10px; }
+              #table_create_form_input { float: left; border: none; padding: 0.5%; width: 90%; height: 100% }
+              #table_create_form_button { float: right; width: 10%; }
+        
+      #lists { position: fixed; right: 0; bottom: 5%; width: 20%; height: 95%; background: rgba(36,36,36,1); }
+        #page { position: absolute; bottom: 0; width: 100%; height: 70%; padding: 5px; overflow: auto; }
+        #page2 { position: absolute; top: 5%; width: 100%; height: 30%; padding: 5px; overflow: auto; }
+        #page3 { position: absolute; top: 0; width: 100%; height: 5%; padding: 5px; }
+          #room_name { background: #ccc; padding: 5px 10px; text-align: center; }
+      #chat_boxes { position: fixed; bottom: 0; width: 100%; height: 5%; }
+        #chat_form { position: relative; bottom: 0; background: rgba(36,36,36,1); padding: 0.5%; height: 100%; width: 100%; }
+          #chat_input { float: left; border: none; padding: 0.5%; width: 90%; height: 100% }
+          #chat_button { float: right; width: 10%; }
+      /*#private_form { position: absolute; top: 0; background: #000; padding: 0.5%; height: 50%; width: 100%; }
+      #private_input { position: relative; left:0; border: 0; padding: 0.5%; width: 90%; height: 100% }
+      #private_button { position: relative; right:0; border: none; padding: 0.5%; width: 10%; height: 100%; background: rgb(130, 224, 255); }*/
+      #messages { position: relative; list-style-type: none; margin: 0; padding: 0; }
+        #messages li { padding: 5px 10px; background: #ccc;}
+        #messages li:nth-child(odd) { background: #eee; }
+      #userlist { position: relative; list-style-type: none; margin: 0; padding: 0; }
+        #userlist li { padding: 5px 10px; background: #ccc; }
+        #userlist li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <div id="gamespace">
+        <button id="start_button">Vote for game start</button>
+        <div id="table_container">
+            <div id="table_create_form_bg">
+                <div id="table_create_form_content">
+                    <form id="table_create_form" action="">
+                        <input id="table_create_form_input" autocomplete="off"/><button id="table_create_form_button">Create</button>
+                    </form>
+                </div>
+            </div>
+            <div>
+              <table id="table">
+                <thead id="table_head">
+                  <tr><th>Roomname</th><th>Connected</th></tr>
+                </thead>
+                <tbody id="table_body">
+                </tbody>
+              </table>
+            </div>
+            <div id="table_buttons">
+                <button onclick="table_create()" id="table_create">Create new room</button>
+                <button id="table_refresh">Refresh List</button>
+                <button id="table_join">Join room</button>
+            </div>
+        </div>
+    </div>
+    <div id="lists">
+      <div id="page">
+        <ul id="messages"></ul>
+      </div>
+      <div id="page2">
+        <ul id="userlist">
+        </ul>
+      </div>
+      <div id="page3">
+        <p id="room_name">Room: Lobby</p>
+      </div>
+    </div>
+    <div id="chat_boxes">
+      <form id="chat_form" action="">
+        <input id="chat_input" autocomplete="off" /><button id="chat_button">Send</button>
+      </form>
+      <!--<form id="private_form" action="">
+        <input id="private_input" autocomplete="off"/><button id="private_button">Send private</button>
+      </form>-->
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script>
+        
+      function table_create() {
+        document.getElementById("table_create_form_bg").style.display = "block";
+      }
+      window.onclick = function(event) {
+        if (event.target == document.getElementById("table_create_form_bg")) {
+          document.getElementById("table_create_form_bg").style.display = "none";
+        }
+      }
+        
+      $(function () {
+        var socket = io();
+        function getCookie(name) {
+          var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+          if (match) return match[2];
+        }
+        
+        $('#chat_form').submit(function(){
+          socket.emit('chat message', $('#chat_input').val());
+          $('#chat_input').val('');
+          return false;
+        });
+        
+        $('#table_create_form').submit(function(){
+          socket.emit('t_create', $('#table_create_form_input').val());
+          $('#table_create_form_input').val('');
+          document.getElementById("table_create_form_bg").style.display = "none";
+          return false;
+        });
+          
+        $('#table_refresh').on('click', function(){
+          socket.emit('t_refresh');
+          return false;
+        });
+        
+        $('#table_join').on('click', function(){
+          socket.emit('t_join');
+          return false;
+        });
+        
+        /*$('#private_form').submit(function(){
+          socket.emit('private message', 'me', $('#private_input').val());//replace 'me' with correct $username
+          $('#private_input').val('');
+          return false;
+        });*/
+        socket.on('get_username', function(){
+            var username = getCookie("token");
+            socket.emit('username', username);
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+          $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+        });
+        socket.on('con message', function(msg){
+          $('#messages').append($('<li>').text(msg.msg));
+          //$('#userlist').append($('<li>').text(msg.data));                doesn't allow classes, therefore iterate
+          console.log(msg.data);
+          console.log(msg.msg);
+          $('#userlist').empty();
+          for (var conID in msg.data) {
+            $('#userlist').append('<li id="' + conID + '">' + msg.data[conID] + '</li>');
+          }
+          $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+        });
+        socket.on('discon message', function(msg){
+          $('#messages').append($('<li>').text(msg.msg));
+          $('#' + msg.key).remove();
+          $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+        });
+        socket.on('room_list', function(list){
+          console.log(list);
+          $('#table_body').empty();
+          for (var x in list) {
+            console.log(list[x]);
+            if (x != 'Lobby') {
+                $('#table_body').append('<tr id="' + x + '"><td>' + x + '</td><td>' + list[x].length + '</td></tr>');
+            }
+          }
+        });
+        socket.on('room_joined', function(room_name){
+          console.log(room_name.data);
+          console.log(room_name.msg);
+          document.getElementById('room_name').innerHTML = 'Room: ' + room_name.msg;
+          document.getElementById('table_container').style.display = "none";
+          document.getElementById('start_button').style.display = "block";
+          $('#messages').empty();
+          $('#userlist').empty();
+          for (var conID in room_name.data) {
+            $('#userlist').append('<li id="' + conID + '">' + room_name.data[conID] + '</li>');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

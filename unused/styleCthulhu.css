@@ -1,0 +1,36 @@
+.logoCthulhu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(2, 2);
+    width: 128px;
+    height: 128px;
+    transition: all 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.logoCthulhu #outer {
+    fill: none;
+    pointer-events: all;
+    stroke-width: 8;
+    stroke: #000000;
+    transition: 1000ms;
+}
+.logoCthulhu #inner {
+    fill: none;
+    stroke-width: 3.5;
+    stroke: #000000;
+    transition: 1000ms;
+}
+.logoCthulhu #links {
+    pointer-events: all;
+    fill: none;
+    stroke-width: 3.5;
+    stroke: #000000;
+    transition: 1000ms;
+}
+.logoCthulhu #link_1:hover {
+    cursor: pointer;
+}
+.logoCthulhu #all:hover > g {
+    stroke: #2d822d;
+    transition: 1000ms;
+}

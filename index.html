@@ -1,0 +1,172 @@
+<html>
+    <head>
+        <style>
+            body {
+                background: -webkit-radial-gradient(rgba(57,60,76,1), rgba(36,36,46,1) 80%);
+            }
+            
+            .logoCthulhu {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(2, 2);
+                stroke: #000000;
+                fill: none;
+                pointer-events: all;
+            }
+            .logoCthulhu #outer {
+                stroke-width: 8;
+                transition: 1000ms;
+            }
+            .logoCthulhu #inner {
+                stroke-width: 3.5;
+                transition: 1000ms;
+            }
+            .logoCthulhu .link {
+                stroke-width: 3.5;
+                transition: 1000ms;
+            }
+            .logoCthulhu #all:hover {
+                stroke: #2d822d;
+            }
+            
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1; /*überlagert den restlichen Content*/
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000000; /*fallback schwarz falls opacity nicht supported*/
+                background-color: rgba(0,0,0,0.4);
+            }
+            .modal-content {
+                background-color: #fefefe;
+                margin: 15% auto; /* 15% von oben, mittig zentriert */
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%; /* Je nach Bildschirmbreite (Handy) anpassen */
+            }
+            
+            /*.flare { be flarey }*/
+        </style>
+        <script>
+            function mouseOverEffect(elem) {
+                elem.setAttribute("r", 4);
+                elem.style.strokeWidth = 7;
+            }
+            function mouseOutEffect(elem) {
+                elem.setAttribute("r", 3);
+                elem.style.strokeWidth = 3.5;
+            }
+            var modal;
+            function mouseClick(sel) {
+                switch(sel) {
+                    case 1:
+                        modal = document.getElementById("login");
+                        modal.style.display = "block";
+                        break;
+                    case 2:
+                        modal = document.getElementById("register");
+                        modal.style.display = "block";
+                        break;
+                    case 3:
+                        modal = document.getElementById("impressum");
+                        modal.style.display = "block";
+                        break;
+                    default:
+                        alert("WTF");
+                }
+            }
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <svg class="logoCthulhu" width="256" height="256" viewBox="0 0 128 128">
+            <g id="all">
+                <g id="outer">
+                    <circle
+                    cx="64"
+                    cy="64"
+                    r="60" />
+                </g>
+                <g id="inner">
+                    <path
+                       style="stroke-linejoin:bevel;"
+                       d="M 6.9366111,45.45899 H 121.06339 L 28.732875,112.54102 64,4 99.267125,112.54102 Z"/>
+                    <path
+                       d="m 19.975767,71.08204 92.763033,0 -57.064511,41.4598 21.796555,-67.08287 c 8.445674,-25.99313 19.14462,-32.65165 17.585762,-14.96081"/>
+                    <path
+                       d="m 117.77535,90.61225 c -5.28357,-1.71672 -6.61822,-4.68325 -14.8521,5.97847"/>
+                    <path
+                       d="M 108.19155,90.73081 64,4 15.458977,99.26712 c 19.052314,-5.10183 34.86033,0.44681 31.686784,9.83724"/>
+                </g>
+                <g id="links">
+                    <circle onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(1)" class="link" id="link_1"
+                        cx="93.225082"
+                        cy="32.8452"
+                        r="3" />
+                    <circle onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(2)" class="link" id="link_2"
+                        cx="45.961941"
+                        cy="111.91334"
+                        r="3" />
+                    <circle onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(3)" class="link" id="link_3"
+                        cx="17.147339"
+                        cy="71.25468"
+                        r="3" />
+                </g>
+            </g>
+        </svg>
+        <div class="modal" id="login">
+            <div class="modal-content">
+                <p>this is login</p>
+                <form action="/login" id="login_form" method="POST">
+                    <p>E-mail:<input type="text" name="email" id="login_email" required></p>
+                    <p>Password:<input type="text" name="pass" id="login_pass" autocomplete="off" required></p>
+                    <p><button type="submit" id="login_button">Login</button></p>
+                </form>
+            </div>
+        </div>
+        <div class="modal" id="register">
+            <div class="modal-content">
+                <p>this is register</p>
+                <form action="/register" id="register_form" method="POST">
+                    <p>E-mail:<input type="text" name="email" id="register_email" required></p>
+                    <p>Username:<input type="text" name="name" id="register_name" required></p>
+                    <p>Password:<input type="text" name="pass" id="register_pass" required></p>
+                    <p><button type="submit" id="register_button">Register</button></p>
+                </form>
+            </div>
+        </div>
+        <div class="modal" id="impressum">
+            <div class="modal-content">
+                <p>this is Impressum</p>
+            </div>
+        </div>
+        <!--
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script>
+            /*var socket = io();
+            $("#login_form").submit(function(){
+                socket.emit("login_cred", { email: $("#login_email").val(), pass: $("#login_pass").val() });
+                $('#login_email').val('');
+                $('#login_pass').val('');
+                return false;
+            });
+            $("#register_form").submit(function(){
+                socket.emit("register_cred", { email: $("#register_email").val(), name: $("#register_name").val(), pass: $("#register_pass").val() });
+                $('#register_email').val('');
+                $('#register_name').val('');
+                $('#register_pass').val('');
+                return false;
+            });*/
+        </script>
+        -->
+    </body>
+</html>
