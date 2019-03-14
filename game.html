@@ -12,7 +12,7 @@
         #table_container { display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border:none; width: 90%; height: 90%; background: rgb(220, 220, 220); }
           #table { position: absolute; top: 0; width: 100%; padding: 5px; overflow: auto; }
             td, th { border: 1px solid grey; text-align: center; height: 20px; }
-            tbody tr:hover { background-color: azure; }
+            tbody tr:hover { background-color: #41bb41; }
           #table_buttons { position: absolute; bottom: 0; width: 100%; height: 5%; padding: 5px; }
           #table_create { float: left; margin-right: 5px; }
           #table_join { float: right; }
@@ -92,7 +92,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script>
-        
+      
+      var selectedRow;
+      
       function table_create() {
         document.getElementById("table_create_form_bg").style.display = "block";
       }
@@ -100,6 +102,14 @@
         if (event.target == document.getElementById("table_create_form_bg")) {
           document.getElementById("table_create_form_bg").style.display = "none";
         }
+      }
+      function rowSel(me) {
+          if (selectedRow != null) {
+            selectedRow.style.backgroundColor = "";
+          }
+          selectedRow = me;
+          console.log("#277027");
+          me.style.backgroundColor = "#277027";
       }
         
       $(function () {
@@ -128,7 +138,11 @@
         });
         
         $('#table_join').on('click', function(){
-          socket.emit('t_join');
+          if (selectedRow != null) {
+              socket.emit('t_create', selectedRow.id);
+              selectedRow = null;
+          }
+          //socket.emit('t_create', );
           return false;
         });
         
@@ -140,6 +154,7 @@
         socket.on('get_username', function(){
             var username = getCookie("token");
             socket.emit('username', username);
+            $('#table_refresh').click();
         });
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
@@ -157,8 +172,7 @@
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         socket.on('discon message', function(msg){
-          $('#messages').append($('<li>').text(msg.msg));
-          $('#' + msg.key).remove();
+          $('#' + msg).remove();
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         socket.on('room_list', function(list){
@@ -167,7 +181,7 @@
           for (var x in list) {
             console.log(list[x]);
             if (x != 'Lobby') {
-                $('#table_body').append('<tr id="' + x + '"><td>' + x + '</td><td>' + list[x].length + '</td></tr>');
+                $('#table_body').append('<tr onclick="rowSel(' + x + ')" id="' + x + '"><td>' + x + '</td><td>' + list[x].length + '</td></tr>');
             }
           }
         });

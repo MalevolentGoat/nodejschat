@@ -71,13 +71,14 @@ io.on("connection", function(socket){
         socket.username = verifiedToken.user;
         console.log(socket.username + ' is his name!');
         socket.leave(Object.keys(socket.rooms)[0]);
-        socket.join('Lobby');
-        io.emit('con message', { msg: socket.username + ' has connected!', data: getUserlistInRoom('Lobby')});
+        socket.join('Lobby', function(){
+          io.to(Object.keys(socket.rooms)[0]).emit('con message', { msg: socket.username + ' has connected!', data: getUserlistInRoom('Lobby')});
+        });
     });
     
-    socket.on('disconnect', function(){
+    socket.on('disconnecting', function(){
         console.log(socket.username + ' has disconnected');
-        io.emit('discon message', { msg: socket.username + ' has disconnected!', key: socket.id });
+        io.to(Object.keys(socket.rooms)[0]).emit('discon message', socket.id);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
@@ -92,6 +93,7 @@ io.on("connection", function(socket){
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
         } else {
+            console.log(Object.keys(socket.rooms)[0]);
             io.to(Object.keys(socket.rooms)[0]).emit('chat message', socket.username + ': ' + msg);
         }
     });
@@ -103,12 +105,11 @@ io.on("connection", function(socket){
     });
     //room_create
     socket.on('t_create', function(table_name) {
-        console.log(socket.rooms); 
+        io.to(Object.keys(socket.rooms)[0]).emit('discon message', socket.id);
         socket.leave(Object.keys(socket.rooms)[0]);
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
-            console.log(socket.username + ' now in rooms: ' + Object.keys(socket.rooms));
+            io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         });
-        socket.emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         //console.log(io.sockets.adapter.rooms);                                      //Debug function to show all rooms
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
         //console.log(socket.rooms);                                                  //Debug to show the socket's rooms
