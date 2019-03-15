@@ -1,4 +1,5 @@
-﻿var app         = require('express')();
+﻿var fs          = require('fs');
+var app         = require('express')();
 var http        = require('http').Server(app);
 var mysql       = require('mysql');
 var io          = require('socket.io')(http);
@@ -15,9 +16,21 @@ var con = mysql.createConnection({
     database: "userbase"
 });
 
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/chain.pem', 'utf8');
+
+const credentials = {
+	key: privateKey,
+	cert: certificate,
+	ca: ca
+};
+
+var https       = require('https').Server(credentials, app);
+
 app.use(bodyParser.urlencoded({ extended : false }));   //this parses the post variables into js compatible strings/arrays
 //app.use(bodyParser.json());                           //Maybe? NO!
-//app.use(require('express').static(__dirname));        //this makes the file directory public, comment out in final release
+//app.use(require('express').static(__dirname, { dotfile: 'allow' }));        //this makes the file directory public, comment out in final release
 
 con.connect(function(err) {
   if (err) throw err;
@@ -131,4 +144,8 @@ function getUserlistInRoom(room) {
 
 http.listen(80, function(){
   console.log('listening on *:80');
+});
+
+https.listen(443, function(){
+  console.log('listening on *:443');
 });
