@@ -1,11 +1,19 @@
 ﻿var fs          = require('fs');
 var app         = require('express')();
 var mysql       = require('mysql');
+var privateKey = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/cert.pem', 'utf8');
+var ca = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/chain.pem', 'utf8');
+var credentials = {
+	key: privateKey,
+	cert: certificate,
+	ca: ca
+};
+var https       = require('https').Server(credentials, app);
 var io          = require('socket.io')(https);
 var crypto      = require('crypto-js');
 var bodyParser  = require('body-parser');
 var jwt         = require('jsonwebtoken');
-
 //Set Parameters for database
 var con = mysql.createConnection({
     host: "localhost",
@@ -14,18 +22,6 @@ var con = mysql.createConnection({
     port: "3306",
     database: "userbase"
 });
-
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/cert.pem', 'utf8');
-const ca = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/chain.pem', 'utf8');
-
-const credentials = {
-	key: privateKey,
-	cert: certificate,
-	ca: ca
-};
-
-var https       = require('https').Server(credentials, app);
 
 app.use(bodyParser.urlencoded({ extended : false }));   //this parses the post variables into js compatible strings/arrays
 //app.use(bodyParser.json());                           //Maybe? NO!
