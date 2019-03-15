@@ -113,7 +113,7 @@
       }
         
       $(function () {
-        var socket = io();
+        var socket = io('//localhost');
         function getCookie(name) {
           var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
           if (match) return match[2];
