@@ -1,6 +1,5 @@
 ﻿var fs          = require('fs');
 var app         = require('express')();
-var http        = require('http').Server(app);
 var mysql       = require('mysql');
 var io          = require('socket.io')(http);
 var crypto      = require('crypto-js');
@@ -38,7 +37,7 @@ con.connect(function(err) {
 });
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');              //calling the domain, in this case the IP sends the landing page
+  res.sendFile(__dirname + '/index.html');              //calling the domain sends the landing page
 });
 
 app.post('/login', function (req, res){
@@ -142,9 +141,11 @@ function getUserlistInRoom(room) {
     return conList;
 }
 
-http.listen(80, function(){
-  console.log('listening on *:80');
-});
+var http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    res.end();
+}).listen(80);
 
 https.listen(443, function(){
   console.log('listening on *:443');
