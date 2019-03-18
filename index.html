@@ -48,8 +48,11 @@
                 border: 1px solid #888;
                 width: 80%; /* Je nach Bildschirmbreite (Handy) anpassen */
             }
+            #register_form_loader {
+                display: none;
+                width: 100px;
+            }
             
-            /*.flare { be flarey }*/
         </style>
         <script>
             function mouseOverEffect(elem) {
@@ -133,7 +136,7 @@
             </div>
         </div>
         <div class="modal" id="register">
-            <div class="modal-content">
+            <div class="modal-content" id="register_form_div">
                 <p>this is register</p>
                 <form action="/register" id="register_form" method="POST">
                     <p>E-mail:<input type="text" name="email" id="register_email" required></p>
@@ -141,6 +144,35 @@
                     <p>Password:<input type="text" name="pass" id="register_pass" required></p>
                     <p><button type="submit" id="register_button">Register</button></p>
                 </form>
+            </div>
+            <div class="modal-content" id="register_form_loader">
+                <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="50px" y="0px"
+                    viewBox="-25 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                    <circle fill="#2d822d" stroke="none" cx="6" cy="50" r="6">
+                        <animate
+                            attributeName="opacity"
+                            dur="1s"
+                            values="0;1;0"
+                            repeatCount="indefinite"
+                            begin="0.1"/>    
+                    </circle>
+                    <circle fill="#2d822d" stroke="none" cx="26" cy="50" r="6">
+                        <animate
+                            attributeName="opacity"
+                            dur="1s"
+                            values="0;1;0"
+                            repeatCount="indefinite"
+                            begin="0.2"/>
+                    </circle>
+                    <circle fill="#2d822d" stroke="none" cx="46" cy="50" r="6">
+                        <animate
+                            attributeName="opacity"
+                            dur="1s"
+                            values="0;1;0"
+                            repeatCount="indefinite" 
+                            begin="0.3"/>     
+                    </circle>
+                </svg>
             </div>
         </div>
         <div class="modal" id="impressum">
@@ -151,27 +183,30 @@
                 <p>One Player is randomly selected as Inspector, a few others as Spawns of Cthulhu and the rest are peasants. Every night the Inspector may investigate the role of one other player, after that the spawns decide which peasant to kill. Finally during the day, the peasants have to choose which fellow member of their town to accuse of murder and kill/send to prison (whatever floats your goat). After the last spawn has been dealt with, the peasants win the game and vice versa.</p>
             </div>
         </div>
-        <!--
-        <script src="/socket.io/socket.io.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
         <script>
-            /*var socket = io();
-            $("#login_form").submit(function(){
-                socket.emit("login_cred", { email: $("#login_email").val(), pass: $("#login_pass").val() });
-                $('#login_email').val('');
-                $('#login_pass').val('');
-                return false;
-            });
             $("#register_form").submit(function(){
+                var a;
                 event.preventDefault();
-                socket.emit("register_cred", { email: $("#register_email").val(), name: $("#register_name").val(), pass: $("#register_pass").val() });
+                /*
+                var $form = $(this),
+                data = $form.serialize(),
+                url = $form.attr('action');
+                var posting = $.post(url, data, function(response)
+                {
+                    var content = $(response).find('#summary');
+                    $('#result').empty().append(content);
+                });
+                */
                 $('#register_email').val('');
                 $('#register_name').val('');
                 $('#register_pass').val('');
-                $('#register_form').style.display = 'none';
+                a = document.getElementById('register_form_div');
+                a.style.display = 'none';
+                a = document.getElementById('register_form_loader');
+                a.style.display = 'block';
                 return false;
-            });*/
+            });
         </script>
-        -->
     </body>
 </html>
