@@ -67,6 +67,7 @@ app.post('/register', function (req, res){
     con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + req.body.name + "', '" + req.body.email + "', '" + req.body.pass + "')", function (err, result) {
         if(err) throw err;
         console.log(result);
+        res.status(200).end();
     });
 });
 
