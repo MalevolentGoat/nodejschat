@@ -163,6 +163,7 @@
                 return false;
             });
             $("#register_form").submit(function(){
+                event.preventDefault();
                 socket.emit("register_cred", { email: $("#register_email").val(), name: $("#register_name").val(), pass: $("#register_pass").val() });
                 $('#register_email').val('');
                 $('#register_name').val('');
