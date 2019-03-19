@@ -197,18 +197,16 @@
                     type:"POST",
                     data: {name: $('#register_name').val(), email:  $('#register_email').val(), pass: $('#register_pass').val()},
                     success: function(result){
-                        event.preventDefault();
                         console.log(result)
+                        a.style.display = 'none';
+                        $("#register").append("<h1>Registration successful</h1>");
                     },
                     error: function(error){
-                        event.preventDefault();
                         console.log(error)
+                        a.style.display = 'none';
+                        $("#register").append("<h1>Registration unsuccessful</h1>");
                     }
                 });
-                $('#register_email').val('');
-                $('#register_name').val('');
-                $('#register_pass').val('');
-                event.preventDefault();
             });
         </script>
     </body>
