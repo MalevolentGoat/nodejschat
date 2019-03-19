@@ -197,9 +197,11 @@
                     data: {name: $('#register_name').val(), email:  $('#register_email').val(), pass: $('#register_pass').val()},
                     datatype: TXT,
                     success: function(result){
+                        event.preventDefault();
                         console.log(result)
                     },
                     error: function(error){
+                        event.preventDefault();
                         console.log(error)
                     }
                 })
