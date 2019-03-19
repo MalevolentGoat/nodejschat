@@ -199,12 +199,12 @@
                     success: function(result){
                         console.log(result)
                         a.style.display = 'none';
-                        $("#register").append("<h1>Registration successful</h1>");
+                        $("#register").append("<h1 class='modal-content'>Registration successful</h1>");
                     },
                     error: function(error){
                         console.log(error)
                         a.style.display = 'none';
-                        $("#register").append("<h1>Registration unsuccessful</h1>");
+                        $("#register").append("<h1 class='modal-content'>Registration unsuccessful</h1>");
                     }
                 });
             });
