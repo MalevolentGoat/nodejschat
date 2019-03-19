@@ -186,6 +186,7 @@
         <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
         <script>
             $("#register_form").submit(function(event){
+                event.preventDefault();
                 var a;
                 a = document.getElementById('register_form_div');
                 a.style.display = 'none';
@@ -195,7 +196,6 @@
                     url: "/register",
                     type:"POST",
                     data: {name: $('#register_name').val(), email:  $('#register_email').val(), pass: $('#register_pass').val()},
-                    datatype: TXT,
                     success: function(result){
                         event.preventDefault();
                         console.log(result)
@@ -204,7 +204,7 @@
                         event.preventDefault();
                         console.log(error)
                     }
-                })
+                });
                 $('#register_email').val('');
                 $('#register_name').val('');
                 $('#register_pass').val('');
