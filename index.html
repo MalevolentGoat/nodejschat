@@ -187,23 +187,25 @@
         <script>
             $("#register_form").submit(function(){
                 var a;
-                /*
-                var $form = $(this),
-                data = $form.serialize(),
-                url = $form.attr('action');
-                var posting = $.post(url, data, function(response)
-                {
-                    var content = $(response).find('#summary');
-                    $('#result').empty().append(content);
-                });
-                */
-                $('#register_email').val('');
-                $('#register_name').val('');
-                $('#register_pass').val('');
                 a = document.getElementById('register_form_div');
                 a.style.display = 'none';
                 a = document.getElementById('register_form_loader');
                 a.style.display = 'block';
+                $.ajax({
+                    url: "/register",
+                    type:"POST",
+                    data: {name: $('#register_name').val(), email:  $('#register_email').val(), pass: $('#register_pass').val()},
+                    datatype: TXT,
+                    success: function(result){
+                        console.log(result)
+                    },
+                    error: function(error){
+                        console.log(error)
+                    }
+                })
+                $('#register_email').val('');
+                $('#register_name').val('');
+                $('#register_pass').val('');
             });
         </script>
     </body>
