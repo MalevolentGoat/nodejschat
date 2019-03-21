@@ -119,8 +119,9 @@ io.on("connection", function(socket){
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         });
+        
         var transcribe = new Array();
-        transcribe = io.sockets.adapter.rooms[table_name].players;
+        //transcribe = io.sockets.adapter.rooms[table_name].players;
         transcribe.push(socket.username);
         io.sockets.adapter.rooms[table_name].players = transcribe;
         
