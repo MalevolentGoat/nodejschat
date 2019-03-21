@@ -122,7 +122,7 @@ io.on("connection", function(socket){
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         });
-        io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].players = getUserlistInRoom(Object.keys(socket.rooms)[0]);
+        io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].players = getUserlistInRoom(table_name);
         
         
         console.log(io.sockets.adapter.rooms[table_name].players);                    //Debug function to show all players in this room
