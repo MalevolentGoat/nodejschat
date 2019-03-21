@@ -1,17 +1,17 @@
 ﻿var fs          = require('fs');
 var app         = require('express')();
 var mysql       = require('mysql');
-/*var privateKey = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/privkey.pem', 'utf8');
+var privateKey = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/privkey.pem', 'utf8');
 var certificate = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/cert.pem', 'utf8');
 var ca = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/chain.pem', 'utf8');
 var credentials = {
 	key: privateKey,
 	cert: certificate,
 	ca: ca
-};*/
-//var https       = require('https').Server(credentials, app);
+};
+var https       = require('https').Server(credentials, app);
 var http        = require('http');
-var io          = require('socket.io')(http);               //add s
+var io          = require('socket.io')(https);
 var crypto      = require('crypto-js');
 var bodyParser  = require('body-parser');
 var jwt         = require('jsonwebtoken');
@@ -141,13 +141,12 @@ function getUserlistInRoom(room) {
     return conList;
 }
 
-//var http = require('http');
+var http = require('http');
 http.createServer(function (req, res) {
-    //res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-    //res.end();
-    console.log('listening on *:3000');
-}).listen(3000);
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    res.end();
+}).listen(80);
 
-/*https.listen(443, function(){
+https.listen(443, function(){
   console.log('listening on *:443');
-});*/
+});
