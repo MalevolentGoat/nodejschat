@@ -87,10 +87,11 @@ io.on("connection", function(socket){
     });
     
     socket.on('disconnecting', function(){
-        console.log(socket.username + ' has disconnected');
-        io.to(Object.keys(socket.rooms)[0]).emit('discon message', socket.id);
-        socket.leave(Object.keys(socket.rooms)[0]);
-        io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].players = getUserlistInRoom(Object.keys(socket.rooms)[0]);
+        var roomname = Object.keys(socket.rooms)[0];
+        console.log(socket.username + ' has disconnected from ' + roomname);
+        io.to(roomname).emit('discon message', socket.id);
+        socket.leave(roomname);
+        io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
