@@ -91,7 +91,11 @@ io.on("connection", function(socket){
         console.log(socket.username + ' has disconnected from ' + roomname);
         io.to(roomname).emit('discon message', socket.id);
         socket.leave(roomname);
-        io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
+        if(io.sockets.adapter.rooms[roomname].players != null) {
+            io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
+        } else {
+            io.sockets.adapter.rooms[roomname].players = null;
+        }
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
@@ -106,7 +110,6 @@ io.on("connection", function(socket){
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
         } else {
-            console.log(Object.keys(socket.rooms)[0]);
             io.to(Object.keys(socket.rooms)[0]).emit('chat message', socket.username + ': ' + msg);
         }
     });
