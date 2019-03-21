@@ -89,6 +89,8 @@ io.on("connection", function(socket){
     socket.on('disconnecting', function(){
         console.log(socket.username + ' has disconnected');
         io.to(Object.keys(socket.rooms)[0]).emit('discon message', socket.id);
+        socket.leave(Object.keys(socket.rooms)[0]);
+        io.sockets.adapter.rooms[table_name].players = getUserlistInRoom(table_name);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
@@ -120,12 +122,8 @@ io.on("connection", function(socket){
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         });
+        io.sockets.adapter.rooms[table_name].players = getUserlistInRoom(table_name);
         
-        if(io.sockets.adapter.rooms[table_name].players != null) {
-            io.sockets.adapter.rooms[table_name].players.push(socket.username);
-        } else {
-            io.sockets.adapter.rooms[table_name].players = new Array(socket.username);
-        }
         
         console.log(io.sockets.adapter.rooms[table_name].players);                    //Debug function to show all players in this room
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
