@@ -121,12 +121,13 @@ io.on("connection", function(socket){
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         });
         
-        var transcribe = new Array();
-        transcribe.push(io.sockets.adapter.rooms[table_name].players);
-        transcribe.push(socket.username);
-        io.sockets.adapter.rooms[table_name].players = transcribe;
+        if(io.sockets.adapter.rooms[table_name].players != null) {
+            io.sockets.adapter.rooms[table_name].players.push(socket.username);
+        } else {
+            io.sockets.adapter.rooms[table_name].players = new Array(socket.username);
+        }
         
-        console.log(io.sockets.adapter.rooms[table_name].players);                                      //Debug function to show all rooms
+        console.log(io.sockets.adapter.rooms[table_name].players);                    //Debug function to show all players in this room
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
         //console.log(socket.rooms);                                                  //Debug to show the socket's rooms
     });
