@@ -119,18 +119,18 @@ io.on("connection", function(socket){
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
         });
-        //console.log(io.sockets.adapter.rooms);                                      //Debug function to show all rooms
+        
+        console.log(io.sockets.adapter.rooms);                                      //Debug function to show all rooms
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
         //console.log(socket.rooms);                                                  //Debug to show the socket's rooms
     });
-    //room_join
-    
+    //room_join not needed same code as room_create
 });
 
 function getUserlistInRoom(room) {
     var conList = {};
     for (var socketID in io.sockets.adapter.rooms[room].sockets) {                //iterates throug sockets in a room
-        conList[socketID] = io.sockets.sockets[socketID].username;                      //appends username to the socket
+        conList[socketID] = io.sockets.sockets[socketID].username;                      //appends username to the socketlist
     }
     for (var conID in conList) {
         console.log(conList[conID]);
