@@ -122,7 +122,7 @@ io.on("connection", function(socket){
         });
         
         var transcribe = new Array();
-        //transcribe = io.sockets.adapter.rooms[table_name].players;
+        transcribe.push(io.sockets.adapter.rooms[table_name].players);
         transcribe.push(socket.username);
         io.sockets.adapter.rooms[table_name].players = transcribe;
         
