@@ -40,22 +40,26 @@ app.get('/', function(req, res){
 app.post('/login', function (req, res){
     console.log(req.body.email);
     console.log(req.body.pass);
-    var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + req.body.email + "'";
+    var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + removeXMLInvalidChars(req.body.email) + "'";
     req.body.pass = crypto.MD5(req.body.pass).toString();
     console.log(req.body.pass);
-    con.query(query_login, function (err, result) {
-        if(err) throw err;
-        console.log(result[0].password);
-        console.log(result[0].name);
-        if(result[0].password == req.body.pass) {
-            console.log("Login Success!");
-            var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
-            res.cookie("token", token);                             //Token is saved in clients local storage
-            res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
-        } else {
-            console.log("something´s wrong");
-        }
-    });
+    try{
+        con.query(query_login, function (err, result) {
+            if(err) throw err;
+            console.log(result[0].password);
+            console.log(result[0].name);
+            if(result[0].password == req.body.pass) {
+                console.log("Login Success!");
+                var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
+                res.cookie("token", token);                             //Token is saved in clients local storage
+                res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
+            } else {
+                console.log("something´s wrong");
+            }
+        });
+    } catch(e) {
+        console.log('FATALITY!' + e);
+    }
 });
 
 app.post('/register', function (req, res){
@@ -64,22 +68,24 @@ app.post('/register', function (req, res){
     console.log(req.body.pass);
     req.body.pass = crypto.MD5(req.body.pass).toString();
     console.log(req.body.pass);
-    //create a function to strip for illegal characters
-    con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + req.body.name + "', '" + req.body.email + "', '" + req.body.pass + "')", function (err, result) {
-        if(err) throw err;
-        console.log(result);
-        res.sendStatus(201);
-    });
+    try{
+        con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
+            if(err) throw err;
+            console.log(result);
+            res.sendStatus(201);
+        });
+    } catch (e) {
+        console.log('FATALITY!' + e);
+    }
 });
 
 io.on("connection", function(socket){
-    console.log('a user connected');
     io.to(socket.id).emit('get_username');
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
         socket.username = verifiedToken.user;
-        console.log(socket.username + ' is his name!');
+        console.log('A user connected: ' + socket.username + ' is his name!');
         socket.leave(Object.keys(socket.rooms)[0]);
         socket.join('Lobby', function(){
           io.to(Object.keys(socket.rooms)[0]).emit('con message', { msg: socket.username + ' has connected!', data: getUserlistInRoom('Lobby')});
@@ -91,7 +97,6 @@ io.on("connection", function(socket){
         console.log(socket.username + ' has disconnected from ' + roomname);
         io.to(roomname).emit('discon message', socket.id);
         socket.leave(roomname);
-        console.log(io.sockets.adapter.rooms);
         if(typeof io.sockets.adapter.rooms[roomname] !== "undefined") {
             io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
         }
@@ -125,7 +130,6 @@ io.on("connection", function(socket){
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
             io.sockets.adapter.rooms[table_name].players = getUserlistInRoom(table_name);
-            console.log(io.sockets.adapter.rooms[table_name].players);
         });
         //console.log(io.sockets.adapter.rooms[table_name].players);                    //Debug function to show all players in this room
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
@@ -140,6 +144,14 @@ function getUserlistInRoom(room) {
         conList[socketID] = io.sockets.sockets[socketID].username;                      //appends username to the socketlist
     }
     return conList;
+}
+
+function removeXMLInvalidChars(string)
+{
+    // remove everything forbidden by XML 1.0 specifications, plus the unicode replacement character U+FFFD
+    var regex = /((?:[\0-\x08\x0B\f\x0E-\x1F\uFFFD\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/g;
+    string = string.replace(regex, "");
+    return string;
 }
 
 var http = require('http');
