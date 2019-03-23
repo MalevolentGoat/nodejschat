@@ -68,14 +68,12 @@ app.post('/register', function (req, res){
     console.log(req.body.pass);
     req.body.pass = crypto.MD5(req.body.pass).toString();
     console.log(req.body.pass);
-    try{
-        con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
+    con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
+        try {if(err) {throw err;} else {
             console.log(result);
             res.sendStatus(201);
-        });
-    } catch (e) {
-        console.log('FATALITY!' + e);
-    }
+        }} catch (e) {console.log(e);}
+    });
 });
 
 io.on("connection", function(socket){
