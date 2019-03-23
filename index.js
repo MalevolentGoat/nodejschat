@@ -72,7 +72,7 @@ app.post('/register', function (req, res){
         try {if(err) {throw err;} else {
             console.log(result);
             res.sendStatus(201);
-        }} catch (e) {console.log(e);}
+        }} catch (e) {res.sendStatus(406);console.log(e);}
     });
 });
 
