@@ -107,7 +107,7 @@ io.on("connection", function(socket){
                     console.log(io.sockets.adapter.rooms);
                     break;
                 case '/players':
-                    console.log(socket.rooms[0].players);
+                    console.log(io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].players);
                     break;
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
