@@ -80,23 +80,23 @@ io.on("connection", function(socket){
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
-        socket.username = verifiedToken.user;
-        console.log('A user connected: ' + socket.username + ' is his name!');
+        socket.game.username = verifiedToken.user;
+        console.log('A user connected: ' + socket.game.username + ' is his name!');
         socket.leave(Object.keys(socket.rooms)[0]);
         socket.join('Lobby', function(){
-          io.to(Object.keys(socket.rooms)[0]).emit('con message', { msg: socket.username + ' has connected!', data: getUserlistInRoom('Lobby')});
+          io.to(Object.keys(socket.rooms)[0]).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom('Lobby')});
         });
     });
     
     socket.on('disconnecting', function(){
         var roomname = Object.keys(socket.rooms)[0];
-        console.log(socket.username + ' has disconnected from ' + roomname);
+        console.log(socket.game.username + ' has disconnected from ' + roomname);
         io.to(roomname).emit('discon message', socket.id);
         socket.leave(roomname);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
-        console.log(socket.username + ': ' + msg);
+        console.log(socket.game.username + ': ' + msg);
         //debugging commands
         if(msg.charAt(0) == '/') {
             switch (msg) {
@@ -107,13 +107,13 @@ io.on("connection", function(socket){
                     console.log(io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]]);
                     break;
                 case '/me':
-                    console.log(socket);
+                    console.log(socket.game);
                     break;
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
         } else {
-            io.to(Object.keys(socket.rooms)[0]).emit('chat message', socket.username + ': ' + msg);
+            io.to(Object.keys(socket.rooms)[0]).emit('chat message', socket.game.username + ': ' + msg);
         }
     });
     
@@ -128,8 +128,9 @@ io.on("connection", function(socket){
         socket.leave(Object.keys(socket.rooms)[0]);
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
-            //io.sockets.sockets[socketID].role = ;
-            //io.sockets.sockets[socketID].status = false;
+            socket.game.role = '';
+            socket.game.status = false;
+            socket.game.alive = true;
         });
         //console.log(io.sockets.adapter.rooms[table_name]);                          //Debug function to show all players in this room
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
@@ -141,7 +142,7 @@ io.on("connection", function(socket){
 function getUserlistInRoom(room) {
     var conList = {};
     for (var socketID in io.sockets.adapter.rooms[room].sockets) {                      //iterates throug sockets in a room
-        conList[socketID] = io.sockets.sockets[socketID].username;                      //appends username to the socketlist
+        conList[socketID] = io.sockets.sockets[socketID].game.username;                      //appends username to the socketlist
     }
     return conList;
 }
