@@ -70,7 +70,6 @@ app.post('/register', function (req, res){
     console.log(req.body.pass);
     try{
         con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
-            if(err) throw err;
             console.log(result);
             res.sendStatus(201);
         });
