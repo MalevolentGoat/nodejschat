@@ -92,10 +92,8 @@ io.on("connection", function(socket){
         io.to(roomname).emit('discon message', socket.id);
         socket.leave(roomname);
         console.log(io.sockets);
-        if(io.sockets.adapter.rooms[roomname].players != null) {
+        if(typeof io.sockets.adapter.rooms[roomname].players !== null) {
             io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
-        } else {
-            io.sockets.adapter.rooms[roomname].players = null;
         }
     });
     
