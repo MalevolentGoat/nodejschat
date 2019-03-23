@@ -43,8 +43,8 @@ app.post('/login', function (req, res){
     var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + removeXMLInvalidChars(req.body.email) + "'";
     req.body.pass = crypto.MD5(req.body.pass).toString();
     console.log(req.body.pass);
-    try{
-        con.query(query_login, function (err, result) {
+    con.query(query_login, function (err, result) {
+        try{
             if(err) throw err;
             console.log(result[0].password);
             console.log(result[0].name);
@@ -56,10 +56,8 @@ app.post('/login', function (req, res){
             } else {
                 console.log("something´s wrong");
             }
-        });
-    } catch(e) {
-        console.log('FATALITY!' + e);
-    }
+        } catch(e) {res.sendStatus(400);console.log(e);}
+    });
 });
 
 app.post('/register', function (req, res){
@@ -72,7 +70,7 @@ app.post('/register', function (req, res){
         try {if(err) {throw err;} else {
             console.log(result);
             res.sendStatus(201);
-        }} catch (e) {res.sendStatus(406);console.log(e);}
+        }} catch (e) {res.sendStatus(400);console.log(e);}
     });
 });
 
