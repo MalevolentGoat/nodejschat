@@ -92,7 +92,7 @@ io.on("connection", function(socket){
         io.to(roomname).emit('discon message', socket.id);
         socket.leave(roomname);
         console.log(io.sockets.adapter.rooms);
-        if(typeof io.sockets.adapter.rooms[roomname].players !== "undefined") {
+        if(typeof io.sockets.adapter.rooms[roomname] !== "undefined") {
             io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
         }
     });
