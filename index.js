@@ -55,6 +55,7 @@ app.post('/login', function (req, res){
                 res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
             } else {
                 console.log("something´s wrong");
+                res.sendStatus(400);
             }
         } catch(e) {res.sendStatus(400);console.log(e);}
     });
