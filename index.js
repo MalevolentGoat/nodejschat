@@ -91,8 +91,8 @@ io.on("connection", function(socket){
         console.log(socket.username + ' has disconnected from ' + roomname);
         io.to(roomname).emit('discon message', socket.id);
         socket.leave(roomname);
-        console.log(io.sockets);
-        if(typeof io.sockets.adapter.rooms[roomname].players !== null) {
+        console.log(io.sockets.adapter.rooms);
+        if(typeof io.sockets.adapter.rooms[roomname].players !== "undefined") {
             io.sockets.adapter.rooms[roomname].players = getUserlistInRoom(roomname);
         }
     });
