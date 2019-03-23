@@ -76,6 +76,7 @@ app.post('/register', function (req, res){
 });
 
 io.on("connection", function(socket){
+    socket.game = new Object();
     io.to(socket.id).emit('get_username');
     
     socket.on('username', function(username) {
