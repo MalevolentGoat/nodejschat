@@ -28,11 +28,6 @@ app.use(bodyParser.urlencoded({ extended : false }));   //this parses the post v
 //app.use(bodyParser.json());                           //Maybe? NO!
 //app.use(require('express').static(__dirname, { dotfile: 'allow' }));        //this makes the file directory public, comment out in final release
 
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
-
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');              //calling the domain sends the landing page
 });
@@ -43,21 +38,25 @@ app.post('/login', function (req, res){
     var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + removeXMLInvalidChars(req.body.email) + "'";
     req.body.pass = crypto.MD5(req.body.pass).toString();
     console.log(req.body.pass);
-    con.query(query_login, function (err, result) {
-        try{
-            if(err) throw err;
-            console.log(result[0].password);
-            console.log(result[0].name);
-            if(result[0].password == req.body.pass) {
-                console.log("Login Success!");
-                var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
-                res.cookie("token", token);                             //Token is saved in clients local storage
-                res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
-            } else {
-                console.log("something´s wrong");
-                res.sendStatus(400);
-            }
-        } catch(e) {res.sendStatus(400);console.log(e);}
+    con.connect(function(err) {
+        if (err) throw err;
+        con.query(query_login, function (err, result) {
+            try{
+                if(err) throw err;
+                console.log(result[0].password);
+                console.log(result[0].name);
+                if(result[0].password == req.body.pass) {
+                    console.log("Login Success!");
+                    var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
+                    res.cookie("token", token);                             //Token is saved in clients local storage
+                    res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
+                } else {
+                    console.log("something´s wrong");
+                    res.sendStatus(400);
+                }
+            } catch(e) {res.sendStatus(400);console.log(e);}
+        });
+        con.end();
     });
 });
 
@@ -67,11 +66,15 @@ app.post('/register', function (req, res){
     console.log(req.body.pass);
     req.body.pass = crypto.MD5(req.body.pass).toString();
     console.log(req.body.pass);
-    con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
-        try {if(err) {throw err;} else {
-            console.log(result);
-            res.sendStatus(201);
-        }} catch (e) {res.sendStatus(400);console.log(e);}
+    con.connect(function(err) {
+        if (err) throw err;
+        con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
+            try {if(err) {throw err;} else {
+                console.log(result);
+                res.sendStatus(201);
+            }} catch (e) {res.sendStatus(400);console.log(e);}
+        });
+        con.end();
     });
 });
 
@@ -138,12 +141,15 @@ io.on("connection", function(socket){
         //console.log(socket.rooms);                                                  //Debug to show the socket's rooms
     });
     //room_join not needed same code as room_create
+    socket.on('vote', function() {
+        socket.game.status = true;
+    });
 });
 
 function getUserlistInRoom(room) {
     var conList = {};
     for (var socketID in io.sockets.adapter.rooms[room].sockets) {                      //iterates throug sockets in a room
-        conList[socketID] = io.sockets.sockets[socketID].game.username;                      //appends username to the socketlist
+        conList[socketID] = io.sockets.sockets[socketID].game.username;                 //appends username to the socketlist
     }
     return conList;
 }

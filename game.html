@@ -111,7 +111,6 @@
           console.log("#277027");
           me.style.backgroundColor = "#277027";
       }
-        
       $(function () {
         var socket = io();
         function getCookie(name) {
@@ -145,12 +144,12 @@
           //socket.emit('t_create', );
           return false;
         });
-        
-        /*$('#private_form').submit(function(){
-          socket.emit('private message', 'me', $('#private_input').val());//replace 'me' with correct $username
-          $('#private_input').val('');
-          return false;
-        });*/
+        $('#start_button').on('click', function(){
+            document.getElementById("start_button").style.display = "none";
+            socket.emit('vote');
+            $('#messages').append($('<li>').text('Waiting for all players being ready'));
+            $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+        })
         socket.on('get_username', function(){
             var username = getCookie("token");
             socket.emit('username', username);
