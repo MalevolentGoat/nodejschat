@@ -196,6 +196,10 @@
             $('#userlist').append('<li id="' + conID + '">' + room_name.data[conID] + '</li>');
           }
         });
+        socket.on('game_start', function(){
+          $('#messages').append($('<li>').text('Game has started'));
+          $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+        });
       });
     </script>
   </body>

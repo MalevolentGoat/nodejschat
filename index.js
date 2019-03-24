@@ -182,13 +182,13 @@ function assignRoles(length, room) {
     for (var x=0;x<spawnCount;x++){
         target = Math.floor(Math.random() * length);
         console.log(target + ': ' + targetArray[target]);
-        if(targetArray[target]!=undefined){
+        if(targetArray[target]==undefined){
             targetArray[target]='Spawn';
         } else { x--; }
     }
     for (var y=0;y<inspeCount;y++){
         target = Math.floor(Math.random() * length);
-        if(targetArray[target]!=undefined){
+        if(targetArray[target]==undefined){
             targetArray[target]='Inspector';
         } else { y--; }
     }
