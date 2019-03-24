@@ -204,7 +204,7 @@
           $('#messages').append($('<li>').text('Game has started'));
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
-          for (var x=0; x<list_items.length(); x++) {
+          for (var x=0; x<list_items.length; x++) {
               $('#grid_container').append($('<button class="grid_content>" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
           }
         });
