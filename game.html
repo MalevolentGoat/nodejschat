@@ -205,7 +205,7 @@
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
           for (var x in list_items) {
-              $('#grid_container').append($('<button class="grid_content>" id="' + list_items[x].getAttribute('id') + '">').text(list_items[x].textContent()));
+              $('#grid_container').append($('<button class="grid_content>" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
           }
         });
       });
