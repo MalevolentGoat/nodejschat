@@ -70,7 +70,6 @@
             </div>
         </div>
         <div id="grid_container">
-            <p>BEEP</p>
         </div>
     </div>
     <div id="lists">
@@ -201,10 +200,13 @@
           }
         });
         socket.on('game_start', function(){
+          var list_items = document.getElementById('userlist').getElementsByTagName("li");
           $('#messages').append($('<li>').text('Game has started'));
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
-            
+          for (var x in list_items) {
+              $('#grid_container').append($('<button class="grid_content>" id="' + list_items[x].getAttribute('id') + '">').text(list_items[x].textContent()));
+          }
         });
       });
     </script>
