@@ -154,9 +154,7 @@
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         $('#grid_container').on('click', '.grid_content', function(event){
-            console.log("something");
-            console.log(event);
-            console.log($(this));
+            console.log($(this).id);
         });
         socket.on('get_username', function(){
             var username = getCookie("token");
