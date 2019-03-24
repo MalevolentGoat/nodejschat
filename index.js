@@ -109,6 +109,11 @@ io.on("connection", function(socket){
                 case '/me':
                     console.log(socket.game);
                     break;
+                case '/status':
+                    for(var socketID in io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]]){
+                        console.log(io.sockets.sockets[socketID].game.role);
+                    }
+                    break;
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
@@ -139,6 +144,7 @@ io.on("connection", function(socket){
     //room_join not needed same code as room_create
     socket.on('vote', function() {
         socket.game.status = true;
+        checkForStart(Object.keys(socket.rooms)[0]);
     });
 });
 
@@ -148,6 +154,52 @@ function getUserlistInRoom(room) {
         conList[socketID] = io.sockets.sockets[socketID].game.username;                 //appends username to the socketlist
     }
     return conList;
+}
+
+function checkForStart (room) {
+    var x = 0;
+    var y = io.sockets.adapter.rooms[room].length;
+    
+    for (var socketID in io.sockets.adapter.rooms[room].sockets) {
+        if(io.sockets.sockets[socketID].game.status == true) {
+            x++;
+        }
+    }
+    if (x >= y && x >= 8) {
+        assignRoles(y, room);
+        io.to(room).emit('game_start');
+    }
+}
+
+
+function assignRoles(length, room) {
+    var spawnCount = length/4;
+    var inspeCount = length/8;
+    var target;
+    var targetArray = [];
+    for (var x=0;x<spawnCount;x){
+        target = Math.floor(Math.random() * length);
+        if(targetArray[target]!=undefined){
+            targetArray[target]='Spawn';
+            x++;
+        }
+    }
+    for (var y=0;y<inspeCount;y){
+        target = Math.floor(Math.random() * length);
+        if(targetArray[target]!=undefined){
+            targetArray[target]='Inspector';
+            y++;
+        }
+    }
+    var z=0;
+    for(var socketID in io.sockets.adapter.rooms[room]){
+        if(targetArray[z]!=undefined){
+            io.sockets.sockets[socketID].game.role=targetArray[z];
+        } else {
+            io.sockets.sockets[socketID].game.role='Peasant';
+        }
+        z++;
+    }
 }
 
 function removeXMLInvalidChars(string)
