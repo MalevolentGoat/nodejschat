@@ -152,7 +152,10 @@
             socket.emit('vote');
             $('#messages').append($('<li>').text('Waiting for all players being ready'));
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
-        })
+        });
+        $('.grid_content').on('click', function(event){
+            console.log(event);
+        });
         socket.on('get_username', function(){
             var username = getCookie("token");
             socket.emit('username', username);

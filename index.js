@@ -156,7 +156,7 @@ function getUserlistInRoom(room) {
     return conList;
 }
 
-function checkForStart (room) {//SUM ERROR HERE -> INFINILOOP
+function checkForStart (room) {
     var x = 0;
     var y = io.sockets.adapter.rooms[room].length;
     console.log('roomlength: ' + y);
