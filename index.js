@@ -177,11 +177,11 @@ function assignRoles(length, room) {
     var spawnCount = length/4;
     var inspeCount = length/8;
     var target;
-    var targetArray = [];
+    var targetArray = new Array(length);
     console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
     for (var x=0;x<spawnCount;x++){
         target = Math.floor(Math.random() * length);
-        console.log(target + targetArray[target]);
+        console.log(target + ': ' + targetArray[target]);
         if(targetArray[target]!=undefined){
             targetArray[target]='Spawn';
         } else { x--; }
