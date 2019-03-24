@@ -193,7 +193,7 @@ function assignRoles(length, room) {
         } else { y--; }
     }
     var z=0;
-    for(var socketID in io.sockets.adapter.rooms[room]){
+    for(var socketID in io.sockets.adapter.rooms[room].sockets){
         if(targetArray[z]!=undefined){
             io.sockets.sockets[socketID].game.role=targetArray[z];
         } else {
