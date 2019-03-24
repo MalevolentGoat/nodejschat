@@ -29,11 +29,11 @@ app.use(bodyParser.urlencoded({ extended : false }));   //this parses the post v
 //app.use(require('express').static(__dirname, { dotfile: 'allow' }));        //this makes the file directory public, comment out in final release
 
 con.connect(function(err) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');              //calling the domain sends the landing page
+    res.sendFile(__dirname + '/index.html');              //calling the domain sends the landing page
 });
 
 app.post('/login', function (req, res){
@@ -104,14 +104,14 @@ io.on("connection", function(socket){
                     console.log(io.sockets.adapter.rooms);
                     break;
                 case '/players':
-                    console.log(io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]]);
+                    console.log(io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].sockets);
                     break;
                 case '/me':
                     console.log(socket.game);
                     break;
                 case '/status':
-                    for(var socketID in io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]]){
-                        console.log(io.sockets.sockets[socketID].game.role);
+                    for(var socketID in io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].sockets){
+                        console.log(io.sockets.sockets[socketID].game);
                     }
                     break;
                 default:
