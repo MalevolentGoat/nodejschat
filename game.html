@@ -153,6 +153,11 @@
             $('#messages').append($('<li>').text('Waiting for all players being ready'));
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
+        $('#grid_container').on('click', '.grid_content', function(event){
+            console.log("something");
+            console.log(event);
+            console.log($(this));
+        });
         socket.on('get_username', function(){
             var username = getCookie("token");
             socket.emit('username', username);
@@ -205,13 +210,8 @@
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
           for (var x=0; x<list_items.length; x++) {
-              $('#grid_container').append($('<button class="grid_content>" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
+              $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
           }
-          $('.grid_content').on('click', function(event){
-            console.log("something");
-            console.log(event);
-            console.log($(this));
-          });
         });
       });
     </script>
