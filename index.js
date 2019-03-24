@@ -156,16 +156,17 @@ function getUserlistInRoom(room) {
     return conList;
 }
 
-function checkForStart (room) {
+function checkForStart (room) {//SUM ERROR HERE -> INFINILOOP
     var x = 0;
     var y = io.sockets.adapter.rooms[room].length;
-    
+    console.log('roomlength: ' + y);
     for (var socketID in io.sockets.adapter.rooms[room].sockets) {
         if(io.sockets.sockets[socketID].game.status == true) {
             x++;
         }
     }
     if (x >= y && x >= 8) {
+        console.log('assigning');
         assignRoles(y, room);
         io.to(room).emit('game_start');
     }
@@ -177,6 +178,7 @@ function assignRoles(length, room) {
     var inspeCount = length/8;
     var target;
     var targetArray = [];
+    console.log('spawns: ' + spawnCount + 'inspectors: ' + inspeCount);
     for (var x=0;x<spawnCount;x){
         target = Math.floor(Math.random() * length);
         if(targetArray[target]!=undefined){
