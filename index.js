@@ -178,20 +178,20 @@ function assignRoles(length, room) {
     var inspeCount = length/8;
     var target;
     var targetArray = [];
-    console.log('spawns: ' + spawnCount + 'inspectors: ' + inspeCount);
-    for (var x=0;x<spawnCount;x){
+    console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
+    for (var x=0;x<spawnCount;x++){
+        console.log(x);
         target = Math.floor(Math.random() * length);
         if(targetArray[target]!=undefined){
             targetArray[target]='Spawn';
-            x++;
-        }
+        } else { x--; }
     }
-    for (var y=0;y<inspeCount;y){
+    for (var y=0;y<inspeCount;y++){
+        console.log(y);
         target = Math.floor(Math.random() * length);
         if(targetArray[target]!=undefined){
             targetArray[target]='Inspector';
-            y++;
-        }
+        } else { y--; }
     }
     var z=0;
     for(var socketID in io.sockets.adapter.rooms[room]){
