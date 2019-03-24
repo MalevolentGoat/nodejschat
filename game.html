@@ -21,7 +21,8 @@
             #table_create_form { margin: 10px; }
               #table_create_form_input { float: left; border: none; padding: 0.5%; width: 90%; height: 100% }
               #table_create_form_button { float: right; width: 10%; }
-        
+        #grid_container { width: 90%; height: 90%; margin: 0 auto; display: none; grid-template-columns: repeat(2, 1fr); grid-gap: 1em; }
+          .grid_content { margin: 0; padding: 0; position: relative; }
       #lists { position: fixed; right: 0; bottom: 5%; width: 20%; height: 95%; background: rgba(36,36,36,1); }
         #page { position: absolute; bottom: 0; width: 100%; height: 70%; padding: 5px; overflow: auto; }
         #page2 { position: absolute; top: 5%; width: 100%; height: 30%; padding: 5px; overflow: auto; }
@@ -67,6 +68,9 @@
                 <button id="table_refresh">Refresh List</button>
                 <button id="table_join">Join room</button>
             </div>
+        </div>
+        <div id="grid_container">
+            <p>BEEP</p>
         </div>
     </div>
     <div id="lists">
@@ -199,6 +203,8 @@
         socket.on('game_start', function(){
           $('#messages').append($('<li>').text('Game has started'));
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+          document.getElementById('grid_container').style.display = "grid");
+            
         });
       });
     </script>

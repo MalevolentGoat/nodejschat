@@ -165,7 +165,7 @@ function checkForStart (room) {//SUM ERROR HERE -> INFINILOOP
             x++;
         }
     }
-    if (x >= y && x >= 8) {
+    if (x >= y && x >= 3) {
         console.log('assigning');
         assignRoles(y, room);
         io.to(room).emit('game_start');
@@ -174,8 +174,8 @@ function checkForStart (room) {//SUM ERROR HERE -> INFINILOOP
 
 
 function assignRoles(length, room) {
-    var spawnCount = length/4;
-    var inspeCount = length/8;
+    var spawnCount = Math.ceil(length/4);
+    var inspeCount = Math.ceil(length/8);
     var target;
     var targetArray = new Array(length);
     console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
