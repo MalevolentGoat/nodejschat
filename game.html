@@ -21,11 +21,11 @@
             #table_create_form { margin: 10px; }
               #table_create_form_input { float: left; border: none; padding: 0.5%; width: 90%; height: 100% }
               #table_create_form_button { float: right; width: 10%; }
-        #grid_container { width: 90%; height: 90%; margin: 0 auto; display: none; grid-template-columns: repeat(2, 1fr); grid-gap: 1em; }
+        #grid_container { position: absolute; left: 5%; top: 5%; width: 90%; height: 90%; margin: 0 auto; display: none; grid-template-columns: repeat(2, 1fr); grid-gap: 1em; }
           .grid_content { margin: 0; padding: 0; position: relative; }
       #lists { position: fixed; right: 0; bottom: 5%; width: 20%; height: 95%; background: rgba(36,36,36,1); }
         #page { position: absolute; bottom: 0; width: 100%; height: 70%; padding: 5px; overflow: auto; }
-        #page2 { position: absolute; top: 5%; width: 100%; height: 30%; padding: 5px; overflow: auto; }
+        #page2 { position: absolute; top: 5%; width: 100%; height: 25%; padding: 5px; overflow: auto; }
         #page3 { position: absolute; top: 0; width: 100%; height: 5%; padding: 5px; }
           #room_name { background: #ccc; padding: 5px 10px; text-align: center; }
       #chat_boxes { position: fixed; bottom: 0; width: 100%; height: 5%; }
@@ -204,7 +204,7 @@
           $('#messages').append($('<li>').text('Game has started'));
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
-          for (var x in list_items) {
+          for (var x=0; x<list_items.length(); x++) {
               $('#grid_container').append($('<button class="grid_content>" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
           }
         });
