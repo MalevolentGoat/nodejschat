@@ -154,7 +154,7 @@
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         $('#grid_container').on('click', '.grid_content', function(event){
-            console.log(event.target.id);
+            socket.emit('target_vote', event.target.id);
         });
         socket.on('get_username', function(){
             var username = getCookie("token");

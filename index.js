@@ -146,6 +146,9 @@ io.on("connection", function(socket){
         socket.game.status = true;
         checkForStart(Object.keys(socket.rooms)[0]);
     });
+    socket.on('target_vote', function(target){
+        
+    });
 });
 
 function getUserlistInRoom(room) {
