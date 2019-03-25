@@ -97,6 +97,7 @@ io.on("connection", function(socket){
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
         console.log(socket.game.username + ': ' + msg);
+        var room = Object.keys(socket.rooms)[0];
         //debugging commands
         if(msg.charAt(0) == '/') {
             switch (msg) {
@@ -104,21 +105,32 @@ io.on("connection", function(socket){
                     console.log(io.sockets.adapter.rooms);
                     break;
                 case '/players':
-                    console.log(io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].sockets);
+                    console.log(io.sockets.adapter.rooms[room].sockets);
                     break;
                 case '/me':
                     console.log(socket.game);
                     break;
                 case '/status':
-                    for(var socketID in io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].sockets){
+                    for(var socketID in io.sockets.adapter.rooms[room].sockets){
                         console.log(io.sockets.sockets[socketID].game);
                     }
                     break;
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
+        } else if (io.sockets.adapter.rooms[room].phase != undefined) {
+            switch (io.sockets.adapter.rooms[room].phase) {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                default:
+                    console.log('Fatal logic error');
+            }
         } else {
-            io.to(Object.keys(socket.rooms)[0]).emit('chat message', socket.game.username + ': ' + msg);
+            io.to(room).emit('chat message', socket.game.username + ': ' + msg);
         }
     });
     
@@ -168,7 +180,8 @@ function checkForStart (room) {
     if (x >= y && x >= 3) {
         console.log('assigning');
         assignRoles(y, room);
-        io.to(room).emit('game_start');
+        io.sockets.adapter.rooms[room].phase = 1;
+        io.to(room).emit('game_start', io.sockets.adapter.rooms[room].phase);
     }
 }
 

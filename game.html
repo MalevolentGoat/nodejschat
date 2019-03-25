@@ -202,15 +202,35 @@
             $('#userlist').append('<li id="' + conID + '">' + room_name.data[conID] + '</li>');
           }
         });
-        socket.on('game_start', function(){
+        socket.on('game_start', function(phase){
           var list_items = document.getElementById('userlist').getElementsByTagName("li");
           $('#messages').append($('<li>').text('Game has started'));
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
           for (var x=0; x<list_items.length; x++) {
-              $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
+              if(list_items[x].id == socket.id) {
+                  $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '" disabled>' + list_items[x].innerHTML + '</button>'));
+              } else {
+                  $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
+              }
           }
+          phaseHandler(phase);
         });
+        function phaseHandler(phase) {
+            switch (phase) {//talking is handled serverside
+                case 1://day let everyone talk and vote
+                    
+                    break;
+                case 2://dusk the invesitgator(s) may talk and vote
+                    
+                    break;
+                case 3://night the spawns may talk and vote
+                    
+                    break;
+                default:
+                    console.log('Fatal logic error');
+            }
+        }
       });
     </script>
   </body>
