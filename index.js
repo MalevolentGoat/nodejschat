@@ -77,27 +77,26 @@ app.post('/register', function (req, res){
 io.on("connection", function(socket){
     socket.game = new Object();
     io.to(socket.id).emit('get_username');
+    var currentRoom = '';
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
         socket.game.username = verifiedToken.user;
         console.log('A user connected: ' + socket.game.username + ' is his name!');
-        socket.leave(Object.keys(socket.rooms)[0]);
         socket.join('Lobby', function(){
-          io.to(Object.keys(socket.rooms)[0]).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom('Lobby')});
+          currentRoom = 'Lobby';
+          io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
         });
     });
     
     socket.on('disconnecting', function(){
-        var roomname = Object.keys(socket.rooms)[0];
-        console.log(socket.game.username + ' has disconnected from ' + roomname);
-        io.to(roomname).emit('discon message', socket.id);
-        socket.leave(roomname);
+        console.log(socket.game.username + ' has disconnected from ' + currentRoom);
+        io.to(currentRoom).emit('discon message', socket.id);
+        socket.leave(currentRoom);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
         console.log(socket.game.username + ': ' + msg);
-        var room = Object.keys(socket.rooms)[0];
         //debugging commands
         if(msg.charAt(0) == '/') {
             switch (msg) {
@@ -105,39 +104,39 @@ io.on("connection", function(socket){
                     console.log(io.sockets.adapter.rooms);
                     break;
                 case '/players':
-                    console.log(io.sockets.adapter.rooms[room].sockets);
+                    console.log(io.sockets.adapter.rooms[currentRoom].sockets);
                     break;
                 case '/me':
                     console.log(socket.game);
                     break;
                 case '/status':
-                    for(var socketID in io.sockets.adapter.rooms[room].sockets){
+                    for(var socketID in io.sockets.adapter.rooms[currentRoom].sockets){
                         console.log(io.sockets.sockets[socketID].game);
                     }
                     break;
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
-        } else if (io.sockets.adapter.rooms[room].phase != undefined) {
-            switch (io.sockets.adapter.rooms[room].phase) {
+        } else if (io.sockets.adapter.rooms[currentRoom].phase != undefined) {
+            switch (io.sockets.adapter.rooms[currentRoom].phase) {
                 case 1://peasant phase
-                    io.to(room).emit('chat message', socket.game.username + ': ' + msg);
+                    io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
                     break;
                 case 2://inspector phase
-                    if(io.sockets.adapter.rooms[room].inspectors.includes(socket.id)){
-                       io.to(room).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
+                    if(io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
+                       io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
                        }
                     break;
                 case 3://spawn phase
-                    if(io.sockets.adapter.rooms[room].spawns.includes(socket.id)){
-                       io.to(room).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
+                    if(io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
+                       io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
                        }
                     break;
                 default:
                     console.log('Fatal logic error');
             }
         } else {
-            io.to(room).emit('chat message', socket.game.username + ': ' + msg);
+            io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
         }
     });
     
@@ -148,10 +147,11 @@ io.on("connection", function(socket){
     });
     //room_create
     socket.on('t_create', function(table_name) {
-        io.to(Object.keys(socket.rooms)[0]).emit('discon message', socket.id);
-        socket.leave(Object.keys(socket.rooms)[0]);
+        io.to(currentRoom).emit('discon message', socket.id);
+        socket.leave(currentRoom);
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
-            io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
+            currentRoom = table_name;
+            io.to(Object.keys(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
             socket.game.role = '';
             socket.game.status = false;
             socket.game.alive = true;
@@ -163,7 +163,7 @@ io.on("connection", function(socket){
     //room_join not needed same code as room_create
     socket.on('vote', function() {
         socket.game.status = true;
-        checkForStart(Object.keys(socket.rooms)[0]);
+        checkForStart(currentRoom);
     });
 });
 
