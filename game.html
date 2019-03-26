@@ -6,7 +6,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       button { border: none; padding: 0.5%; background: #41bb41; height: 100%; }
-      
+        button:disabled { background: #ccc; }
       #gamespace { position: fixed; left: 0; top: 0; width: 80%; height: 95%; background: -webkit-radial-gradient(rgba(57,60,76,1), rgba(36,36,46,1) 80%); }
         #start_button { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40%; height: 10%; }
         #table_container { display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border:none; width: 90%; height: 90%; background: rgb(220, 220, 220); }
@@ -50,7 +50,8 @@
             <div id="table_create_form_bg">
                 <div id="table_create_form_content">
                     <form id="table_create_form" action="">
-                        <input id="table_create_form_input" autocomplete="off"/><button id="table_create_form_button">Create</button>
+                        <p>Roomname (max. 16 characters)</p>
+                        <input id="table_create_form_input" maxlength="16" autocomplete="off"/><button id="table_create_form_button">Create</button>
                     </form>
                 </div>
             </div>
@@ -144,7 +145,6 @@
               socket.emit('t_create', selectedRow.id);
               selectedRow = null;
           }
-          //socket.emit('t_create', );
           return false;
         });
         $('#start_button').on('click', function(){
@@ -154,7 +154,8 @@
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         $('#grid_container').on('click', '.grid_content', function(event){
-            socket.emit('target_vote', event.target.id);
+            socket.emit('phase_vote', event.target.getAttribute('name'));
+            console.log(event.target.getAttribute('name'));
         });
         socket.on('get_username', function(){
             var username = getCookie("token");
@@ -185,14 +186,12 @@
           $('#table_body').empty();
           for (var x in list) {
             console.log(list[x]);
-            if (x != 'Lobby') {
+            if (x != 'Lobby' && x.length <= 18) {
                 $('#table_body').append('<tr onclick="rowSel(' + x + ')" id="' + x + '"><td>' + x + '</td><td>' + list[x].length + '</td></tr>');
             }
           }
         });
         socket.on('room_joined', function(room_name){
-          console.log(room_name.data);
-          console.log(room_name.msg);
           document.getElementById('room_name').innerHTML = 'Room: ' + room_name.msg;
           document.getElementById('table_container').style.display = "none";
           document.getElementById('start_button').style.display = "block";
@@ -202,15 +201,39 @@
             $('#userlist').append('<li id="' + conID + '">' + room_name.data[conID] + '</li>');
           }
         });
-        socket.on('game_start', function(){
+        socket.on('game_start', function(phase){
           var list_items = document.getElementById('userlist').getElementsByTagName("li");
           $('#messages').append($('<li>').text('Game has started'));
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
           document.getElementById('grid_container').style.display = "grid";
           for (var x=0; x<list_items.length; x++) {
-              $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
+              if(list_items[x].id == socket.id) {
+                  $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '" disabled>' + list_items[x].innerHTML + '</button>'));
+              } else {
+                  $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
+              }
           }
+          phaseHandler(phase);
+          socket.emit('get_role', socket.id);
         });
+        socket.on('reveil', function(msg){
+            document.getElementsByName(msg.target)[0].innerHTML += '<p>' + msg.role + '</p>';
+        });
+        function phaseHandler(phase) {
+            switch (phase) {//talking is handled serverside
+                case 1://day let everyone talk and vote
+                    
+                    break;
+                case 2://dusk the investigator(s) may talk and vote
+                    
+                    break;
+                case 3://night the spawns may talk and vote
+                    
+                    break;
+                default:
+                    console.log('Fatal logic error');
+            }
+        }
       });
     </script>
   </body>

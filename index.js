@@ -77,22 +77,22 @@ app.post('/register', function (req, res){
 io.on("connection", function(socket){
     socket.game = new Object();
     io.to(socket.id).emit('get_username');
+    var currentRoom = '';
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
         socket.game.username = verifiedToken.user;
         console.log('A user connected: ' + socket.game.username + ' is his name!');
-        socket.leave(Object.keys(socket.rooms)[0]);
         socket.join('Lobby', function(){
-          io.to(Object.keys(socket.rooms)[0]).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom('Lobby')});
+          currentRoom = 'Lobby';
+          io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
         });
     });
     
     socket.on('disconnecting', function(){
-        var roomname = Object.keys(socket.rooms)[0];
-        console.log(socket.game.username + ' has disconnected from ' + roomname);
-        io.to(roomname).emit('discon message', socket.id);
-        socket.leave(roomname);
+        console.log(socket.game.username + ' has disconnected from ' + currentRoom);
+        io.to(currentRoom).emit('discon message', socket.id);
+        socket.leave(currentRoom);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
@@ -104,21 +104,45 @@ io.on("connection", function(socket){
                     console.log(io.sockets.adapter.rooms);
                     break;
                 case '/players':
-                    console.log(io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].sockets);
+                    console.log(io.sockets.adapter.rooms[currentRoom].sockets);
                     break;
                 case '/me':
                     console.log(socket.game);
                     break;
                 case '/status':
-                    for(var socketID in io.sockets.adapter.rooms[Object.keys(socket.rooms)[0]].sockets){
+                    for(var socketID in io.sockets.adapter.rooms[currentRoom].sockets){
                         console.log(io.sockets.sockets[socketID].game);
                     }
                     break;
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
+        } else if (io.sockets.adapter.rooms[currentRoom].phase != undefined) {
+            switch (io.sockets.adapter.rooms[currentRoom].phase) {
+                case 1://peasant phase
+                    if(socket.game.alive == true){
+                       io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
+                    }
+                    break;
+                case 2://inspector phase
+                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
+                        for(var inspectors in io.sockets.adapter.rooms[currentRoom].inspectors){
+                            io.to(inspectors).emit('chat message', socket.game.username + ': ' + msg);
+                        }
+                    }
+                    break;
+                case 3://spawn phase
+                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
+                        for(var spawns in io.sockets.adapter.rooms[currentRoom].spawns){
+                            io.to(spawns).emit('chat message', socket.game.username + ': ' + msg);
+                        }
+                    }
+                    break;
+                default:
+                    console.log('Fatal logic error');
+            }
         } else {
-            io.to(Object.keys(socket.rooms)[0]).emit('chat message', socket.game.username + ': ' + msg);
+            io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
         }
     });
     
@@ -129,10 +153,11 @@ io.on("connection", function(socket){
     });
     //room_create
     socket.on('t_create', function(table_name) {
-        io.to(Object.keys(socket.rooms)[0]).emit('discon message', socket.id);
-        socket.leave(Object.keys(socket.rooms)[0]);
+        io.to(currentRoom).emit('discon message', socket.id);
+        socket.leave(currentRoom);
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
-            io.to(Object.keys(socket.rooms)[0]).emit('room_joined', { msg: table_name, data: getUserlistInRoom(table_name)});
+            currentRoom = table_name;
+            io.to(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
             socket.game.role = '';
             socket.game.status = false;
             socket.game.alive = true;
@@ -144,7 +169,33 @@ io.on("connection", function(socket){
     //room_join not needed same code as room_create
     socket.on('vote', function() {
         socket.game.status = true;
-        checkForStart(Object.keys(socket.rooms)[0]);
+        checkForStart(currentRoom);
+    });
+    socket.on('get_role', function(target){
+        io.to(socket.id).emit('reveil', { target: target, role: io.sockets.sockets[target].game.role });
+    });
+    socket.on('phase_vote', function(target){
+        switch(io.sockets.adapter.rooms[currentRoom].phase) {
+            case 1:
+                if(socket.game.alive == true){
+                   
+                }
+                break;
+            case 2:
+                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
+                    io.sockets.adapter.rooms[currentRoom].inspectors[socket.id] = target;
+                    
+                    //io.to(socket.id).emit('reveil', { target: target, role: io.sockets.sockets[target].game.role });   send as soon as all have voted
+                }
+                break;
+            case 3:
+                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
+                   
+                }
+                break;
+            default:
+                console.log('Another Critical');
+        }
     });
     socket.on('target_vote', function(target){
         
@@ -171,14 +222,31 @@ function checkForStart (room) {
     if (x >= y && x >= 3) {
         console.log('assigning');
         assignRoles(y, room);
-        io.to(room).emit('game_start');
+        io.sockets.adapter.rooms[room].phase = 1;
+        io.sockets.adapter.rooms[room].phase_voteList = [];
+        io.to(room).emit('game_start', io.sockets.adapter.rooms[room].phase);
     }
 }
 
+function checkForVote (room, role) {
+    var x = 0;
+    var y = io.sockets.adapter.rooms[room].inspectors.length;
+    for (var z in io.sockets.adapter.rooms[room].inspectors) {
+        if(z != undefined) {
+            x++;
+        }
+    }
+    if(x == y) {
+        
+    }
+}
 
 function assignRoles(length, room) {
     var spawnCount = Math.ceil(length/4);
     var inspeCount = Math.ceil(length/8);
+    io.sockets.adapter.rooms[room].peasants = [];
+    io.sockets.adapter.rooms[room].inspectors = [];
+    io.sockets.adapter.rooms[room].spawns = [];
     var target;
     var targetArray = new Array(length);
     console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
@@ -197,10 +265,15 @@ function assignRoles(length, room) {
     }
     var z=0;
     for(var socketID in io.sockets.adapter.rooms[room].sockets){
-        if(targetArray[z]!=undefined){
-            io.sockets.sockets[socketID].game.role=targetArray[z];
+        if(targetArray[z]=='Spawn'){
+            io.sockets.sockets[socketID].game.role='Spawn';
+            io.sockets.adapter.rooms[room].spawns.push(socketID);
+        } else if (targetArray[z]=='Inspector') {
+            io.sockets.sockets[socketID].game.role='Inspector';
+            io.sockets.adapter.rooms[room].inspectors.push(socketID);
         } else {
             io.sockets.sockets[socketID].game.role='Peasant';
+            io.sockets.adapter.rooms[room].peasants.push(socketID);
         }
         z++;
     }
