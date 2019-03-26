@@ -155,6 +155,7 @@
         });
         $('#grid_container').on('click', '.grid_content', function(event){
             socket.emit('phase_vote', event.target.getAttribute('name'));
+            console.log(event.target.getAttribute('name'));
         });
         socket.on('get_username', function(){
             var username = getCookie("token");

@@ -179,17 +179,19 @@ io.on("connection", function(socket){
             case 1:
                 if(socket.game.alive == true){
                    
-                   }
+                }
                 break;
             case 2:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
-                   
-                   }
+                    io.sockets.adapter.rooms[currentRoom].inspectors[socket.id] = target;
+                    
+                    //io.to(socket.id).emit('reveil', { target: target, role: io.sockets.sockets[target].game.role });   send as soon as all have voted
+                }
                 break;
             case 3:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
                    
-                   }
+                }
                 break;
             default:
                 console.log('Another Critical');
@@ -223,6 +225,18 @@ function checkForStart (room) {
     }
 }
 
+function checkForVote (room, role) {
+    var x = 0;
+    var y = io.sockets.adapter.rooms[room].inspectors.length;
+    for (var z in io.sockets.adapter.rooms[room].inspectors) {
+        if(z != undefined) {
+            x++;
+        }
+    }
+    if(x == y) {
+        
+    }
+}
 
 function assignRoles(length, room) {
     var spawnCount = Math.ceil(length/4);
