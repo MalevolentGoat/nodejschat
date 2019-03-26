@@ -120,11 +120,18 @@ io.on("connection", function(socket){
             }
         } else if (io.sockets.adapter.rooms[room].phase != undefined) {
             switch (io.sockets.adapter.rooms[room].phase) {
-                case 1:
+                case 1://peasant phase
+                    io.to(room).emit('chat message', socket.game.username + ': ' + msg);
                     break;
-                case 2:
+                case 2://inspector phase
+                    if(io.sockets.adapter.rooms[room].inspectors.includes(socket.id)){
+                       io.to(room).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
+                       }
                     break;
-                case 3:
+                case 3://spawn phase
+                    if(io.sockets.adapter.rooms[room].spawns.includes(socket.id)){
+                       io.to(room).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
+                       }
                     break;
                 default:
                     console.log('Fatal logic error');
@@ -189,6 +196,9 @@ function checkForStart (room) {
 function assignRoles(length, room) {
     var spawnCount = Math.ceil(length/4);
     var inspeCount = Math.ceil(length/8);
+    io.sockets.adapter.rooms[room].peasants = [];
+    io.sockets.adapter.rooms[room].inspectors = [];
+    io.sockets.adapter.rooms[room].spawns = [];
     var target;
     var targetArray = new Array(length);
     console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
@@ -207,10 +217,15 @@ function assignRoles(length, room) {
     }
     var z=0;
     for(var socketID in io.sockets.adapter.rooms[room].sockets){
-        if(targetArray[z]!=undefined){
-            io.sockets.sockets[socketID].game.role=targetArray[z];
+        if(targetArray[z]=='Spawn'){
+            io.sockets.sockets[socketID].game.role='Spawn';
+            io.sockets.adapter.rooms[room].spawns.push(socketID);
+        } else if (targetArray[z]=='Inspector') {
+            io.sockets.sockets[socketID].game.role='Inspector';
+            io.sockets.adapter.rooms[room].inspectors.push(socketID);
         } else {
             io.sockets.sockets[socketID].game.role='Peasant';
+            io.sockets.adapter.rooms[room].peasants.push(socketID);
         }
         z++;
     }
