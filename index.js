@@ -120,17 +120,23 @@ io.on("connection", function(socket){
         } else if (io.sockets.adapter.rooms[currentRoom].phase != undefined) {
             switch (io.sockets.adapter.rooms[currentRoom].phase) {
                 case 1://peasant phase
-                    io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
+                    if(socket.game.alive == true){
+                       io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
+                    }
                     break;
                 case 2://inspector phase
-                    if(io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
-                       io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
-                       }
+                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
+                        for(var inspectors in io.sockets.adapter.rooms[currentRoom].inspectors){
+                            io.to(inspectors).emit('chat message', socket.game.username + ': ' + msg);
+                        }
+                    }
                     break;
                 case 3://spawn phase
-                    if(io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
-                       io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);//change to directsocket
-                       }
+                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
+                        for(var spawns in io.sockets.adapter.rooms[currentRoom].spawns){
+                            io.to(spawns).emit('chat message', socket.game.username + ': ' + msg);
+                        }
+                    }
                     break;
                 default:
                     console.log('Fatal logic error');
@@ -165,6 +171,30 @@ io.on("connection", function(socket){
         socket.game.status = true;
         checkForStart(currentRoom);
     });
+    socket.on('get_role', function(target){
+        io.to(socket.id).emit('reveil', { target: target, role: io.sockets.sockets[target].game.role });
+    });
+    socket.on('phase_vote', function(target){
+        switch(io.sockets.adapter.rooms[currentRoom].phase) {
+            case 1:
+                if(socket.game.alive == true){
+                   
+                   }
+                break;
+            case 2:
+                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
+                   
+                   }
+                break;
+            case 3:
+                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
+                   
+                   }
+                break;
+            default:
+                console.log('Another Critical');
+        }
+    });
 });
 
 function getUserlistInRoom(room) {
@@ -188,6 +218,7 @@ function checkForStart (room) {
         console.log('assigning');
         assignRoles(y, room);
         io.sockets.adapter.rooms[room].phase = 1;
+        io.sockets.adapter.rooms[room].phase_voteList = [];
         io.to(room).emit('game_start', io.sockets.adapter.rooms[room].phase);
     }
 }

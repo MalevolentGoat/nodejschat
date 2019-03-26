@@ -155,7 +155,7 @@
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         $('#grid_container').on('click', '.grid_content', function(event){
-            console.log(event.target.id);
+            socket.emit('phase_vote', event.target.id);
         });
         socket.on('get_username', function(){
             var username = getCookie("token");
@@ -216,13 +216,17 @@
               }
           }
           phaseHandler(phase);
+          socket.emit('get_role', socket.id);
+        });
+        socket.on('reveil', function(msg){
+            document.getElementsByTagName('button').getElementById(msg.target).innerHTML += '<p>' + msg.role + '</p>';
         });
         function phaseHandler(phase) {
             switch (phase) {//talking is handled serverside
                 case 1://day let everyone talk and vote
                     
                     break;
-                case 2://dusk the invesitgator(s) may talk and vote
+                case 2://dusk the investigator(s) may talk and vote
                     
                     break;
                 case 3://night the spawns may talk and vote
