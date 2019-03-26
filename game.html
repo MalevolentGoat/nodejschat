@@ -50,7 +50,8 @@
             <div id="table_create_form_bg">
                 <div id="table_create_form_content">
                     <form id="table_create_form" action="">
-                        <input id="table_create_form_input" autocomplete="off"/><button id="table_create_form_button">Create</button>
+                        <p>Roomname (max. 16 characters)</p>
+                        <input id="table_create_form_input" maxlength="16" autocomplete="off"/><button id="table_create_form_button">Create</button>
                     </form>
                 </div>
             </div>
@@ -185,7 +186,7 @@
           $('#table_body').empty();
           for (var x in list) {
             console.log(list[x]);
-            if (x != 'Lobby') {
+            if (x != 'Lobby'|| x.length <= 18) {
                 $('#table_body').append('<tr onclick="rowSel(' + x + ')" id="' + x + '"><td>' + x + '</td><td>' + list[x].length + '</td></tr>');
             }
           }
