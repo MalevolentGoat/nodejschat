@@ -151,7 +151,7 @@ io.on("connection", function(socket){
         socket.leave(currentRoom);
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             currentRoom = table_name;
-            io.to(Object.keys(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
+            io.to(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
             socket.game.role = '';
             socket.game.status = false;
             socket.game.alive = true;
