@@ -186,7 +186,7 @@
           $('#table_body').empty();
           for (var x in list) {
             console.log(list[x]);
-            if (x != 'Lobby'|| x.length <= 18) {
+            if (x != 'Lobby' || x.length >= 18) {
                 $('#table_body').append('<tr onclick="rowSel(' + x + ')" id="' + x + '"><td>' + x + '</td><td>' + list[x].length + '</td></tr>');
             }
           }
