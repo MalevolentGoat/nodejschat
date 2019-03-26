@@ -91,7 +91,7 @@ io.on("connection", function(socket){
     
     socket.on('disconnecting', function(){
         console.log(socket.game.username + ' has disconnected from ' + currentRoom);
-        io.to(currentRoom).emit('discon message', socket.id);
+        io.to(currentRoom).emit('discon message', socket.game.username);
         socket.leave(currentRoom);
     });
     
@@ -153,7 +153,7 @@ io.on("connection", function(socket){
     });
     //room_create
     socket.on('t_create', function(table_name) {
-        io.to(currentRoom).emit('discon message', socket.id);
+        io.to(currentRoom).emit('discon message', socket.game.username);
         socket.leave(currentRoom);
         socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
             currentRoom = table_name;
