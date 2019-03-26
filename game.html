@@ -197,7 +197,7 @@
           $('#messages').empty();
           $('#userlist').empty();
           for (var conID in room_name.data) {
-            $('#userlist').append('<li id="' + room_name.data[conID] + '">' + room_name.data[conID] + '</li>');
+            $('#userlist').append('<li id="' + conID + '">' + room_name.data[conID] + '</li>');
           }
         });
         socket.on('game_start', function(phase){
@@ -207,16 +207,16 @@
           document.getElementById('grid_container').style.display = "grid";
           for (var x=0; x<list_items.length; x++) {
               if(list_items[x].id == socket.id) {
-                  $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '" disabled>' + list_items[x].innerHTML + '</button>'));
+                  $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '" disabled>' + list_items[x].innerHTML + '</button>'));
               } else {
-                  $('#grid_container').append($('<button class="grid_content" id="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
+                  $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
               }
           }
           phaseHandler(phase);
           socket.emit('get_role', socket.id);
         });
         socket.on('reveil', function(msg){
-            document.getElementById(msg.target).innerHTML += '<p>' + msg.role + '</p>';
+            document.getElementsByName(msg.target)[0].innerHTML += '<p>' + msg.role + '</p>';
         });
         function phaseHandler(phase) {
             switch (phase) {//talking is handled serverside
