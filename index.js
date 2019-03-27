@@ -176,7 +176,7 @@ io.on("connection", function(socket){
         io.to(socket.id).emit('reveil_self', { target: target, role: io.sockets.sockets[target].game.role });
     });
     socket.on('phase_vote', function(target){
-        var result;
+        var result={};
         switch(io.sockets.adapter.rooms[currentRoom].phase) {
             case 1:
                 if(socket.game.alive == true){
