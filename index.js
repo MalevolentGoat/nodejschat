@@ -253,6 +253,7 @@ function checkForVote (room, role, response_type) {
     if(role == 'peasants'){
         y = io.sockets.adapter.rooms[room].length;
         for (var z in io.sockets.adapter.rooms[room].sockets) {
+            console.log(z);
             if(io.sockets.sockets[z].game.vote != false) {
                 buffer[z] = io.sockets.sockets[z].game.vote;
                 x++;
@@ -261,9 +262,10 @@ function checkForVote (room, role, response_type) {
     } else {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
-            console.log('length'+y);
+            console.log('length: '+y);
             console.log(z);
             console.log(io.sockets.adapter.rooms[room][role]);
+            console.log(io.sockets.adapter.rooms[room][role][0]);
             if(io.sockets.sockets[z].game.vote != false) {                      //ERROR HERE
                 buffer[z] = io.sockets.sockets[z].game.vote;
                 x++;
