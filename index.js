@@ -185,7 +185,8 @@ io.on("connection", function(socket){
                     result = checkForVote(currentRoom, 'peasants', 'single');
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
-                        phaseHandler(currentRoom);
+                        io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
+                        phaseHandler(currentRoom, result);
                     }
                 }
                 break;
@@ -198,7 +199,7 @@ io.on("connection", function(socket){
                         for(var x in result){
                             io.to(x).emit('reveil', { target: result[x], role: io.sockets.sockets[result[x]].game.role });
                         }
-                        phaseHandler(currentRoom);
+                        phaseHandler(currentRoom, false);
                     }
                 }
                 break;
@@ -209,7 +210,8 @@ io.on("connection", function(socket){
                     console.log(result);
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
-                        phaseHandler(currentRoom);
+                        io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
+                        phaseHandler(currentRoom, result);
                     }
                 }
                 break;
@@ -240,7 +242,6 @@ function checkForStart (room) {
         console.log('assigning');
         assignRoles(y, room);
         io.sockets.adapter.rooms[room].phase = 1;
-        io.sockets.adapter.rooms[room].phase_voteList = [];
         io.to(room).emit('game_start', io.sockets.adapter.rooms[room].phase);
     }
 }
@@ -296,7 +297,7 @@ function checkForVote (room, role, response_type) {
                 }
                 if(modes.length == 1){
                     return modes;
-                } else { phaseHandler(room); } //CALL NEXT PHASE BECAUSE OF TIE
+                } else { phaseHandler(room, false); } //CALL NEXT PHASE BECAUSE OF TIE
                 break;
             default:
                 console.log('WOW!');
@@ -304,20 +305,48 @@ function checkForVote (room, role, response_type) {
     }
 }
 
-function phaseHandler(room){
-    var dead=[];
+function phaseHandler(room, dead){
+    var y;
     var phase=io.sockets.adapter.rooms[room].phase;
-    for (z in io.sockets.adapter.rooms[room].sockets){
-        io.sockets.sockets[z].game.vote = false;
-        if(io.sockets.sockets[z].game.alive == false){
-            dead.push(io.sockets.sockets[z].id);
-        }
+    switch(phase){
+        case 1:
+            y=0;
+            for(var x in io.sockets.adapter.rooms[room].inspectors){
+                if(io.sockets.sockets[x].game.alive == true) {
+                    y++;
+                }
+            }
+            if(y==0){
+                phase++;
+            } else {phase++;break;}
+        case 2:
+            y=0;
+            for(var x in io.sockets.adapter.rooms[room].spawns){
+                if(io.sockets.sockets[x].game.alive == true) {
+                    y++;
+                }
+            }
+            if(y==0){
+                cleanUp(room, 'peasants');
+                return false;
+            } else {phase++;break;}
+        case 3:
+            y=0;
+            for(var x in io.sockets.adapter.rooms[room].sockets){
+                if(io.sockets.sockets[x].game.alive == true) {
+                    y++;
+                }
+            }
+            if(io.sockets.adapter.rooms[room].spawns.length == y){
+                cleanUp(room, 'spawns');
+                return false;
+            } else {phase=1;break;}
+            break;
+        default:
+            console.log('Woopsie!');
     }
-    if(phase==3){
-        phase=1;
-    } else {phase++;}
     io.sockets.adapter.rooms[room].phase = phase;
-    io.to(room).emit('phaseHandler', {phase: phase, dead: dead});
+    io.to(room).emit('phaseHandler', {phase: phase, dead: dead});//IF false
 }
 
 function assignRoles(length, room) {
@@ -357,8 +386,18 @@ function assignRoles(length, room) {
     }
 }
 
-function removeXMLInvalidChars(string)
-{
+function cleanUp(room, winner){
+    for(var x in io.sockets.adapter.rooms[room].sockets){
+        io.sockets.sockets[x].game.role = '';
+        io.sockets.sockets[x].game.status = false;
+        io.sockets.sockets[x].game.alive = true;
+        io.sockets.sockets[x].game.vote = false;
+    }
+    io.sockets.adapter.rooms[room].phase=null;
+    io.to(room).emit('end', winner);
+}
+
+function removeXMLInvalidChars(string) {
     // remove everything forbidden by XML 1.0 specifications, plus the unicode replacement character U+FFFD
     var regex = /((?:[\0-\x08\x0B\f\x0E-\x1F\uFFFD\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/g;
     string = string.replace(regex, "");
