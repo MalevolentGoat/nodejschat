@@ -183,10 +183,8 @@ io.on("connection", function(socket){
                     socket.game.vote = target;
                     console.log(socket.game.vote);
                     result = checkForVote(currentRoom, 'peasants', 'single');
-                    console.log(result);
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
-                        console.log(result[0]);
                         phaseHandler(currentRoom);
                     }
                 }
@@ -248,7 +246,6 @@ function checkForStart (room) {
 }
 
 function checkForVote (room, role, response_type) {
-    console.log(room+' '+role+' '+response_type);
     var buffer = {};
     var response;
     var x = 0;
@@ -261,8 +258,6 @@ function checkForVote (room, role, response_type) {
                 x++;
             }
         }
-        console.log('Length: '+y+' count: '+x+' Buffer: ');
-        console.log(buffer);
     } else {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
@@ -271,8 +266,6 @@ function checkForVote (room, role, response_type) {
                 x++;
             }
         }
-        console.log('Length: '+y+' count: '+x+' Buffer: ');
-        console.log(buffer);
     }
     if(x == y) {
         switch(response_type){
@@ -314,12 +307,13 @@ function phaseHandler(room){
     var dead=[];
     var phase=io.sockets.adapter.rooms[room].phase;
     for (z in io.sockets.adapter.rooms[room].sockets){
-        console.log(z);
         io.sockets.sockets[z].game.vote = false;
         if(io.sockets.sockets[z].game.alive == false){
             dead.push(io.sockets.sockets[z]);
         }
     }
+    console.log(phase);
+    console.log(dead);
     if(phase==3){
         phase=1;
     } else {phase++;}
