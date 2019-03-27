@@ -185,7 +185,7 @@ io.on("connection", function(socket){
                     result = checkForVote(currentRoom, 'peasants', 'single');
                     console.log(result);
                     if(result){
-                        io.sockets.sockets[result].game.alive = false;
+                        io.sockets.sockets[result[0]].game.alive = false;
                         phaseHandler(currentRoom);
                     }
                 }
@@ -194,6 +194,7 @@ io.on("connection", function(socket){
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
                     socket.game.vote = target;
                     result = checkForVote(currentRoom, 'inspectors', 'multi');
+                    console.log(result);
                     if(result){
                         for(var x in result){
                             io.to(x).emit('reveil', { target: result[x], role: io.sockets.sockets[result[x]].game.role });
@@ -206,8 +207,9 @@ io.on("connection", function(socket){
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
                     socket.game.vote = target;
                     result = checkForVote (currentRoom, 'spawns', 'single');
+                    console.log(result);
                     if(result){
-                        io.sockets.sockets[result].game.alive = false;
+                        io.sockets.sockets[result[0]].game.alive = false;
                         phaseHandler(currentRoom);
                     }
                 }
@@ -298,7 +300,7 @@ function checkForVote (room, role, response_type) {
                     }
                 }
                 if(modes.length == 1){
-                    return modes[0];
+                    return modes;
                 } else { phaseHandler(room); } //CALL NEXT PHASE BECAUSE OF TIE
                 break;
             default:
