@@ -103,6 +103,7 @@
       
       var selectedRow;
       var ownrole;
+        
       function table_create() {
         document.getElementById("table_create_form_bg").style.display = "block";
       }
@@ -228,7 +229,7 @@
         });
         socket.on('phaseHandler', function(msg){
             for(var i in msg.dead){
-                $('button[name="'msg.dead[i]'"]').attr('disabled', true);
+                $('button[name="' + msg.dead[i] + '"]').attr('disabled', true);
             }
             switch(msg.phase){
                 case 1:
