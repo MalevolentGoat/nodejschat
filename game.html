@@ -8,6 +8,7 @@
       button { border: none; padding: 0.5%; background: #41bb41; height: 100%; }
         button:disabled { background: #ccc; }
       #gamespace { position: fixed; left: 0; top: 0; width: 80%; height: 95%; background: -webkit-radial-gradient(rgba(57,60,76,1), rgba(36,36,46,1) 80%); }
+        #overlay { position: absolute; left: 5%; top: 5%; width: 90%; height: 90%; margin: 0 auto; display:none; }
         #start_button { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40%; height: 10%; }
         #table_container { display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border:none; width: 90%; height: 90%; background: rgb(220, 220, 220); }
           #table { position: absolute; top: 0; width: 100%; padding: 5px; overflow: auto; }
@@ -45,6 +46,9 @@
   </head>
   <body>
     <div id="gamespace">
+        <div id="overlay">
+            <p>You are asleep. Wait for Daybreak.</p>
+        </div>
         <button id="start_button">Vote for game start</button>
         <div id="table_container">
             <div id="table_create_form_bg">
@@ -98,7 +102,7 @@
     <script>
       
       var selectedRow;
-      
+      var ownrole;
       function table_create() {
         document.getElementById("table_create_form_bg").style.display = "block";
       }
@@ -213,27 +217,37 @@
                   $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
               }
           }
-          phaseHandler(phase);
           socket.emit('get_role', socket.id);
+        });
+        socket.on('reveil_self', function(msg){
+            document.getElementsByName(msg.target)[0].innerHTML += '<p>' + msg.role + '</p>';
+            ownrole = msg.role;
         });
         socket.on('reveil', function(msg){
             document.getElementsByName(msg.target)[0].innerHTML += '<p>' + msg.role + '</p>';
         });
-        function phaseHandler(phase) {
-            switch (phase) {//talking is handled serverside
-                case 1://day let everyone talk and vote
-                    
+        socket.on('phaseHandler', function(msg){
+            for(var i in msg.dead){
+                $('button[name="'msg.dead[i]'"]').attr('disabled', true);
+            }
+            switch(msg.phase){
+                case 1:
+                    document.getElementById('overlay').style.display = "none";
                     break;
-                case 2://dusk the investigator(s) may talk and vote
-                    
+                case 2:
+                    if(ownrole == 'inspector') {
+                        document.getElementById('overlay').style.display = "none";
+                    } else { document.getElementById('overlay').style.display = "block"; }
                     break;
-                case 3://night the spawns may talk and vote
-                    
+                case 3:
+                    if(ownrole == 'spawn') {
+                        document.getElementById('overlay').style.display = "none";
+                    } else { document.getElementById('overlay').style.display = "block"; }
                     break;
                 default:
-                    console.log('Fatal logic error');
+                    console.log('Another Huge F-Up');
             }
-        }
+        });
       });
     </script>
   </body>
