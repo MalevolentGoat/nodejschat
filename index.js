@@ -182,6 +182,7 @@ io.on("connection", function(socket){
                 if(socket.game.alive == true){
                     socket.game.vote = target;
                     console.log(socket.game.vote);
+                    console.log(result+" phase 1");
                     result = checkForVote(currentRoom, 'peasants', 'single');
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
@@ -193,6 +194,7 @@ io.on("connection", function(socket){
             case 2:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
                     socket.game.vote = target;
+                    console.log(result+" phase 2");
                     result = checkForVote(currentRoom, 'inspectors', 'multi');
                     console.log(result);
                     if(result){
@@ -206,6 +208,7 @@ io.on("connection", function(socket){
             case 3:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
                     socket.game.vote = target;
+                    console.log(result+" phase 3");
                     result = checkForVote (currentRoom, 'spawns', 'single');
                     console.log(result);
                     if(result){
