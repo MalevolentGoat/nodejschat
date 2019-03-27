@@ -103,6 +103,7 @@
       
       var selectedRow;
       var ownrole;
+      var alive = true;
         
       function table_create() {
         document.getElementById("table_create_form_bg").style.display = "block";
@@ -229,6 +230,10 @@
         });
         socket.on('phaseHandler', function(msg){
             for(var i in msg.dead){
+                if(msg.dead[i]==socket.id){
+                    document.getElementById('overlay').innerHTML="You are dead!";
+                    alive=false;
+                }
                 $('button[name="' + msg.dead[i] + '"]').attr('disabled', true);
             }
             console.log(msg.phase);
@@ -238,13 +243,13 @@
                     document.getElementById('overlay').style.display = "none";
                     break;
                 case 2:
-                    if(ownrole == 'inspector') {
+                    if(ownrole == 'Inspector') {
                         console.log(msg.phase);
                         document.getElementById('overlay').style.display = "none";
                     } else { document.getElementById('overlay').style.display = "block"; }
                     break;
                 case 3:
-                    if(ownrole == 'spawn') {
+                    if(ownrole == 'Spawn') {
                         console.log(msg.phase);
                         document.getElementById('overlay').style.display = "none";
                     } else { document.getElementById('overlay').style.display = "block"; }
@@ -253,6 +258,9 @@
                     console.log('Another Huge F-Up');
             }
         });
+          socket.on('end', function(winner){
+              
+          });
       });
     </script>
   </body>
