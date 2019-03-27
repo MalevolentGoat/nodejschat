@@ -330,7 +330,7 @@ function phaseHandler(room, dead){
             }
             if(y==0){
                 cleanUp(room, 'peasants');
-                return false;
+                break;
             } else {phase++;break;}
         case 3:
             y=0;
@@ -341,14 +341,14 @@ function phaseHandler(room, dead){
             }
             if(io.sockets.adapter.rooms[room].spawns.length == y){
                 cleanUp(room, 'spawns');
-                return false;
+                break;
             } else {phase=1;break;}
             break;
         default:
             console.log('Woopsie!');
     }
     io.sockets.adapter.rooms[room].phase = phase;
-    io.to(room).emit('phaseHandler', {phase: phase, dead: dead});//IF false
+    io.to(room).emit('phaseHandler', {phase: phase, dead: dead});
 }
 
 function assignRoles(length, room) {
