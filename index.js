@@ -312,7 +312,6 @@ function phaseHandler(room){
             dead.push(io.sockets.sockets[z].id);
         }
     }
-    console.log(dead);
     if(phase==3){
         phase=1;
     } else {phase++;}
