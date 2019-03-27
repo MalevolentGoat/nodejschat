@@ -396,6 +396,7 @@ function cleanUp(room, winner){
         io.sockets.sockets[x].game.vote = false;
     }
     io.sockets.adapter.rooms[room].phase=null;
+    console.log('And the winner is: '+winner);
     io.to(room).emit('end', winner);
 }
 
