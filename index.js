@@ -251,7 +251,7 @@ function checkForVote (room, role, response_type) {
         y = io.sockets.adapter.rooms[room].sockets.length;
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.vote != false) {
-                buffer.push({z: io.sockets.sockets[z].game.vote});
+                buffer[z] = io.sockets.sockets[z].game.vote;
                 x++;
             }
         }
@@ -259,7 +259,7 @@ function checkForVote (room, role, response_type) {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
             if(io.sockets.sockets[z].game.vote != false) {
-                buffer.push({z: io.sockets.sockets[z].game.vote});
+                buffer[z] = io.sockets.sockets[z].game.vote;
                 x++;
             }
         }
