@@ -183,7 +183,6 @@ io.on("connection", function(socket){
                     socket.game.vote = target;
                     console.log(socket.game.vote);
                     console.log("phase 1");
-                    console.log(result);
                     result = checkForVote(currentRoom, 'peasants', 'single');
                     console.log(result);
                     if(result){
@@ -197,7 +196,6 @@ io.on("connection", function(socket){
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
                     socket.game.vote = target;
                     console.log("phase 2");
-                    console.log(result);
                     result = checkForVote(currentRoom, 'inspectors', 'multi');
                     console.log(result);
                     if(result){
@@ -212,7 +210,6 @@ io.on("connection", function(socket){
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
                     socket.game.vote = target;
                     console.log("phase 3");
-                    console.log(result);
                     result = checkForVote (currentRoom, 'spawns', 'single');
                     console.log(result);
                     if(result){
@@ -257,10 +254,10 @@ function checkForVote (room, role, response_type) {
     var buffer = {};
     var x = 0;
     var y = 0;
-    
+    console.log('checking for votes');
     if(role == 'peasants'){
         for (var z in io.sockets.adapter.rooms[room].sockets) {
-            if(io.sockets.sockets[z].game.alive != false) {
+            if(io.sockets.sockets[z].game.alive == true) {
                 y++;
             }
         }
@@ -308,7 +305,7 @@ function checkForVote (room, role, response_type) {
                 }
                 if(modes.length == 1){
                     return modes;
-                } else { phaseHandler(room, false); } //CALL NEXT PHASE BECAUSE OF TIE
+                } else { phaseHandler(room, false); }
                 break;
             default:
                 console.log('WOW!');
