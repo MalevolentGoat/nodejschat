@@ -277,9 +277,10 @@ function checkForVote (room, role, response_type) {
             }
         }
     }
-    console.log(x);
-    console.log(y);
     if(x == y) {
+        for(var z in io.sockets.adapter.rooms[room].sockets) {
+            io.sockets.sockets[z].game.vote = false;
+        }
         switch(response_type){
             case 'multi':
                 return buffer;
