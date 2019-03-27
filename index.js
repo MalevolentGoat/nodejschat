@@ -309,10 +309,9 @@ function phaseHandler(room){
     for (z in io.sockets.adapter.rooms[room].sockets){
         io.sockets.sockets[z].game.vote = false;
         if(io.sockets.sockets[z].game.alive == false){
-            dead.push(io.sockets.sockets[z]);
+            dead.push(io.sockets.sockets[z].id);
         }
     }
-    console.log(phase);
     console.log(dead);
     if(phase==3){
         phase=1;
