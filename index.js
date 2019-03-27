@@ -299,6 +299,8 @@ function checkForVote (room, role, response_type) {
                         maxCount = modeMap[el];
                     }
                 }
+                console.log(modes);
+                console.log(modes.length);
                 if(modes.length == 1){
                     return modes;
                 } else { phaseHandler(room); } //CALL NEXT PHASE BECAUSE OF TIE
