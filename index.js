@@ -1,6 +1,7 @@
 ﻿var fs          = require('fs');
 var app         = require('express')();
 var mysql       = require('mysql');
+
 var privateKey = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/privkey.pem', 'utf8');
 var certificate = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/cert.pem', 'utf8');
 var ca = fs.readFileSync('/etc/letsencrypt/live/malevolentgoat.at/chain.pem', 'utf8');
@@ -9,12 +10,14 @@ var credentials = {
 	cert: certificate,
 	ca: ca
 };
+//TODO: anzeige wen man wählt / leave button / Phasen indikator
 var https       = require('https').Server(credentials, app);
 var http        = require('http');
 var io          = require('socket.io')(https);
 var crypto      = require('crypto-js');
 var bodyParser  = require('body-parser');
 var jwt         = require('jsonwebtoken');
+
 //Set Parameters for database
 var con = mysql.createConnection({
     host: "localhost",
@@ -37,23 +40,16 @@ app.get('/', function(req, res){
 });
 
 app.post('/login', function (req, res){
-    console.log(req.body.email);
-    console.log(req.body.pass);
     var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + removeXMLInvalidChars(req.body.email) + "'";
     req.body.pass = crypto.MD5(req.body.pass).toString();
-    console.log(req.body.pass);
     con.query(query_login, function (err, result) {
         try{
             if(err) throw err;
-            console.log(result[0].password);
-            console.log(result[0].name);
             if(result[0].password == req.body.pass) {
-                console.log("Login Success!");
                 var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
                 res.cookie("token", token);                             //Token is saved in clients local storage
                 res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
             } else {
-                console.log("something´s wrong");
                 res.sendStatus(400);
             }
         } catch(e) {res.sendStatus(400);console.log(e);}
@@ -61,14 +57,9 @@ app.post('/login', function (req, res){
 });
 
 app.post('/register', function (req, res){
-    console.log(req.body.name);
-    console.log(req.body.email);
-    console.log(req.body.pass);
     req.body.pass = crypto.MD5(req.body.pass).toString();
-    console.log(req.body.pass);
     con.query("INSERT INTO `user` (`name`, `mail`, `password`) VALUES ('" + removeXMLInvalidChars(req.body.name) + "', '" + removeXMLInvalidChars(req.body.email) + "', '" + req.body.pass + "')", function (err, result) {
         try {if(err) {throw err;} else {
-            console.log(result);
             res.sendStatus(201);
         }} catch (e) {res.sendStatus(400);console.log(e);}
     });
@@ -82,7 +73,7 @@ io.on("connection", function(socket){
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
         socket.game.username = verifiedToken.user;
-        console.log('A user connected: ' + socket.game.username + ' is his name!');
+        console.log(socket.game.username);
         socket.join('Lobby', function(){
           currentRoom = 'Lobby';
           io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
@@ -90,13 +81,11 @@ io.on("connection", function(socket){
     });
     
     socket.on('disconnecting', function(){
-        console.log(socket.game.username + ' has disconnected from ' + currentRoom);
         io.to(currentRoom).emit('discon message', socket.id);
         socket.leave(currentRoom);
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
-        console.log(socket.game.username + ': ' + msg);
         //debugging commands
         if(msg.charAt(0) == '/') {
             switch (msg) {
@@ -148,7 +137,6 @@ io.on("connection", function(socket){
     
     //room_refresh
     socket.on('t_refresh', function() {
-        console.log(io.sockets.adapter.rooms);
         socket.emit('room_list', io.sockets.adapter.rooms);
     });
     //room_create
@@ -220,14 +208,12 @@ function getUserlistInRoom(room) {
 function checkForStart (room) {
     var x = 0;
     var y = io.sockets.adapter.rooms[room].length;
-    console.log('roomlength: ' + y);
     for (var socketID in io.sockets.adapter.rooms[room].sockets) {
         if(io.sockets.sockets[socketID].game.status == true) {
             x++;
         }
     }
     if (x >= y && x >= 3) {
-        console.log('assigning');
         assignRoles(y, room);
         io.sockets.adapter.rooms[room].phase = 1;
         io.sockets.adapter.rooms[room].phase_voteList = [];
@@ -290,10 +276,8 @@ function assignRoles(length, room) {
     io.sockets.adapter.rooms[room].spawns = [];
     var target;
     var targetArray = new Array(length);
-    console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
     for (var x=0;x<spawnCount;x++){
         target = Math.floor(Math.random() * length);
-        console.log(target + ': ' + targetArray[target]);
         if(targetArray[target]==undefined){
             targetArray[target]='Spawn';
         } else { x--; }
