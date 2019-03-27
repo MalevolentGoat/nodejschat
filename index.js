@@ -278,9 +278,6 @@ function checkForVote (room, role, response_type) {
         }
     }
     if(x == y) {
-        for(var z in io.sockets.adapter.rooms[room].sockets) {
-            io.sockets.sockets[z].game.vote = false;
-        }
         switch(response_type){
             case 'multi':
                 return buffer;
@@ -317,6 +314,9 @@ function checkForVote (room, role, response_type) {
 }
 
 function phaseHandler(room, dead){
+    for(var z in io.sockets.adapter.rooms[room].sockets) {
+        io.sockets.sockets[z].game.vote = false;
+    }
     var y;
     var phase=io.sockets.adapter.rooms[room].phase;
     switch(phase){
