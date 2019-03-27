@@ -126,15 +126,17 @@ io.on("connection", function(socket){
                     break;
                 case 2://inspector phase
                     if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
-                        for(var inspectors in io.sockets.adapter.rooms[currentRoom].inspectors){
-                            io.to(inspectors).emit('chat message', socket.game.username + ': ' + msg);
+                        for(var inspector in io.sockets.adapter.rooms[currentRoom].inspectors){
+                            var x = io.sockets.adapter.rooms[currentRoom].inspectors[inspector];
+                            io.to(x).emit('chat message', socket.game.username + ': ' + msg);
                         }
                     }
                     break;
                 case 3://spawn phase
                     if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
-                        for(var spawns in io.sockets.adapter.rooms[currentRoom].spawns){
-                            io.to(spawns).emit('chat message', socket.game.username + ': ' + msg);
+                        for(var spawn in io.sockets.adapter.rooms[currentRoom].spawns){
+                            var x = io.sockets.adapter.rooms[currentRoom].spawns[spawn];
+                            io.to(x).emit('chat message', socket.game.username + ': ' + msg);
                         }
                     }
                     break;
