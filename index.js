@@ -186,6 +186,7 @@ io.on("connection", function(socket){
                     console.log(result);
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
+                        console.log(result[0]);
                         phaseHandler(currentRoom);
                     }
                 }
@@ -299,8 +300,6 @@ function checkForVote (room, role, response_type) {
                         maxCount = modeMap[el];
                     }
                 }
-                console.log(modes);
-                console.log(modes.length);
                 if(modes.length == 1){
                     return modes;
                 } else { phaseHandler(room); } //CALL NEXT PHASE BECAUSE OF TIE
@@ -313,17 +312,19 @@ function checkForVote (room, role, response_type) {
 
 function phaseHandler(room){
     var dead=[];
+    var phase=io.sockets.adapter.rooms[room].phase;
     for (z in io.sockets.adapter.rooms[room].sockets){
+        console.log(z);
         io.sockets.sockets[z].game.vote = false;
         if(io.sockets.sockets[z].game.alive == false){
             dead.push(io.sockets.sockets[z]);
         }
     }
-    if(io.sockets.adapter.rooms[room].phase){
-        io.sockets.adapter.rooms[room].phase++;
-    } else { io.sockets.adapter.rooms[room].phase=1}
-    
-    io.to(room).emit('phaseHandler', {phase: io.sockets.adapter.rooms[room].phase, dead: dead});
+    if(phase==3){
+        phase=1;
+    } else {phase++;}
+    io.sockets.adapter.rooms[room].phase = phase;
+    io.to(room).emit('phaseHandler', {phase: phase, dead: dead});
 }
 
 function assignRoles(length, room) {
