@@ -254,16 +254,17 @@
                     console.log('Another Huge F-Up');
             }
         });
-          socket.on('end', function(winner){
-              document.getElementById('overlay').innerHTML="You are asleep. Wait for Daybreak.";
-              document.getElementById('overlay').style.display="none";
-              document.getElementById('grid_container').style.display="none";
-              document.getElementById('start_button').style.display="block";
-              $('#messages').append($('<li>').text("The "+winner+"s have won!"));
-              $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
-              ownrole=undefined;
-              alive=true;
-          });
+        socket.on('end', function(winner){
+            var x = document.getElementById('overlay');
+            x.innerHTML="You are asleep. Wait for Daybreak.";
+            x.style.display="none";
+            document.getElementById('grid_container').style.display="none";
+            document.getElementById('start_button').style.display="block";
+            $('#messages').append($('<li>').text("The "+winner+" have won!"));
+            $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
+            ownrole=undefined;
+            alive=true;
+        });
       });
     </script>
   </body>
