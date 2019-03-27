@@ -261,7 +261,7 @@ function checkForVote (room, role, response_type) {
     } else {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
-            if(io.sockets.sockets[z].game.vote != false) {                      //ERROR HERE
+            if(io.sockets.sockets[z].game.vote != false) {                      //ERROR HERE on tie
                 buffer[z] = io.sockets.sockets[z].game.vote;
                 x++;
             }

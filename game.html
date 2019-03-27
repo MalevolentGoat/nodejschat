@@ -117,7 +117,6 @@
             selectedRow.style.backgroundColor = "";
           }
           selectedRow = me;
-          console.log("#277027");
           me.style.backgroundColor = "#277027";
       }
       $(function () {
@@ -160,7 +159,6 @@
         });
         $('#grid_container').on('click', '.grid_content', function(event){
             socket.emit('phase_vote', event.target.getAttribute('name'));
-            console.log(event.target.getAttribute('name'));
         });
         socket.on('get_username', function(){
             var username = getCookie("token");
@@ -228,10 +226,10 @@
             document.getElementsByName(msg.target)[0].innerHTML += '<p>' + msg.role + '</p>';
         });
         socket.on('phaseHandler', function(msg){
-            console.log(ownrole);
             for(var i in msg.dead){
                 $('button[name="' + msg.dead[i] + '"]').attr('disabled', true);
             }
+            console.log(msg.phase);
             switch(msg.phase){
                 case 1:
                     console.log(msg.phase);
