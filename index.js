@@ -317,6 +317,7 @@ function phaseHandler(room, dead){
                     y++;
                 }
             }
+            console.log(y+" Inspectors alive");
             if(y==0){
                 phase++;
             } else {phase++;break;}
@@ -328,18 +329,28 @@ function phaseHandler(room, dead){
                     y++;
                 }
             }
+            console.log(y+" Spawns alive");
             if(y==0){
                 cleanUp(room, 'peasants');
                 return false;
             } else {phase++;break;}
         case 3:
             y=0;
+            z=0;
             for(var x in io.sockets.adapter.rooms[room].sockets){
                 if(io.sockets.sockets[x].game.alive == true) {
                     y++;
                 }
             }
-            if(io.sockets.adapter.rooms[room].spawns.length == y){
+            for(var x in io.sockets.adapter.rooms[room].spawns){
+                var xx = io.sockets.adapter.rooms[room].spawns[x];
+                if(io.sockets.sockets[xx].game.alive == true) {
+                    z++;
+                }
+            }
+            console.log(y+" Players alive");
+            console.log(z+" Spawns alive");
+            if(z == y){
                 cleanUp(room, 'spawns');
                 return false;
             } else {phase=1;break;}
