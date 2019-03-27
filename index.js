@@ -309,17 +309,17 @@ function checkForVote (room, role, response_type) {
 
 function phaseHandler(room){
     var dead=[];
-    for (z in io.sockets.adapter.rooms[currentRoom].sockets){
+    for (z in io.sockets.adapter.rooms[room].sockets){
         io.sockets.sockets[z].game.vote = false;
         if(io.sockets.sockets[z].game.alive == false){
             dead.push(io.sockets.sockets[z]);
         }
     }
-    if(io.sockets.adapter.rooms[currentRoom].phase){
-        io.sockets.adapter.rooms[currentRoom].phase++;
-    } else { io.sockets.adapter.rooms[currentRoom].phase=1}
+    if(io.sockets.adapter.rooms[room].phase){
+        io.sockets.adapter.rooms[room].phase++;
+    } else { io.sockets.adapter.rooms[room].phase=1}
     
-    io.to(room).emit('phaseHandler', {phase: io.sockets.adapter.rooms[currentRoom].phase, dead: dead});
+    io.to(room).emit('phaseHandler', {phase: io.sockets.adapter.rooms[room].phase, dead: dead});
 }
 
 function assignRoles(length, room) {
