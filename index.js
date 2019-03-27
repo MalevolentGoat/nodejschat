@@ -245,6 +245,7 @@ function checkForStart (room) {
 }
 
 function checkForVote (room, role, response_type) {
+    console.log(room+' '+role+' '+response_type);
     var buffer = {};
     var response;
     var x = 0;
@@ -257,6 +258,7 @@ function checkForVote (room, role, response_type) {
                 x++;
             }
         }
+        console.log('Length: '+y+' count: '+x+'Buffer: '+buffer);
     } else {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
@@ -265,6 +267,7 @@ function checkForVote (room, role, response_type) {
                 x++;
             }
         }
+        console.log('Length: '+y+' count: '+x+'Buffer: '+buffer);
     }
     if(x == y) {
         switch(response_type){
