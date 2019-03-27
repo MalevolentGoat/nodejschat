@@ -190,6 +190,7 @@ io.on("connection", function(socket){
                         io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
                         phaseHandler(currentRoom, result);
                     }
+                    result=false;
                 }
                 break;
             case 2:
@@ -205,6 +206,7 @@ io.on("connection", function(socket){
                         }
                         phaseHandler(currentRoom, false);
                     }
+                    result=false;
                 }
                 break;
             case 3:
@@ -219,6 +221,7 @@ io.on("connection", function(socket){
                         io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
                         phaseHandler(currentRoom, result);
                     }
+                    result=false;
                 }
                 break;
             default:
