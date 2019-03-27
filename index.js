@@ -251,14 +251,15 @@ function checkForVote (room, role, response_type) {
     var x = 0;
     var y;                                                                          //number of players of given role
     if(role == 'peasants'){
-        y = io.sockets.adapter.rooms[room].sockets.length;
+        y = io.sockets.adapter.rooms[room].length;
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.vote != false) {
                 buffer[z] = io.sockets.sockets[z].game.vote;
                 x++;
             }
         }
-        console.log('Length: '+y+' count: '+x+'Buffer: '+buffer);
+        console.log('Length: '+y+' count: '+x+' Buffer: ');
+        console.log(buffer);
     } else {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
@@ -267,7 +268,8 @@ function checkForVote (room, role, response_type) {
                 x++;
             }
         }
-        console.log('Length: '+y+' count: '+x+'Buffer: '+buffer);
+        console.log('Length: '+y+' count: '+x+' Buffer: ');
+        console.log(buffer);
     }
     if(x == y) {
         switch(response_type){
@@ -331,7 +333,6 @@ function assignRoles(length, room) {
     console.log('spawns: ' + spawnCount + ' inspectors: ' + inspeCount);
     for (var x=0;x<spawnCount;x++){
         target = Math.floor(Math.random() * length);
-        console.log(target + ': ' + targetArray[target]);
         if(targetArray[target]==undefined){
             targetArray[target]='Spawn';
         } else { x--; }
