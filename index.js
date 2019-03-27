@@ -243,7 +243,7 @@ function checkForStart (room) {
 }
 
 function checkForVote (room, role, response_type) {
-    var buffer;
+    var buffer = {};
     var response;
     var x = 0;
     var y;                                                                          //number of players of given role
@@ -251,7 +251,7 @@ function checkForVote (room, role, response_type) {
         y = io.sockets.adapter.rooms[room].sockets.length;
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.vote != false) {
-                buffer[z] = io.sockets.sockets[z].game.vote;
+                buffer.push({z: io.sockets.sockets[z].game.vote});
                 x++;
             }
         }
@@ -259,7 +259,7 @@ function checkForVote (room, role, response_type) {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
             if(io.sockets.sockets[z].game.vote != false) {
-                buffer[z] = io.sockets.sockets[z].game.vote;
+                buffer.push({z: io.sockets.sockets[z].game.vote});
                 x++;
             }
         }
