@@ -258,7 +258,11 @@
             var x = document.getElementById('overlay');
             x.innerHTML="You are asleep. Wait for Daybreak.";
             x.style.display="none";
-            document.getElementById('grid_container').style.display="none";
+            x = document.getElementById('grid_container');
+            x.style.display="none";
+            while(x.lastChild){
+                x.removeChild(x.lastChild);
+            }
             document.getElementById('start_button').style.display="block";
             $('#messages').append($('<li>').text("The "+winner+" have won!"));
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
