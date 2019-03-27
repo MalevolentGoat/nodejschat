@@ -185,12 +185,12 @@ io.on("connection", function(socket){
                     console.log("phase 1");
                     console.log(result);
                     result = checkForVote(currentRoom, 'peasants', 'single');
+                    console.log(result);
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
                         io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
                         phaseHandler(currentRoom, result);
                     }
-                    result=false;
                 }
                 break;
             case 2:
@@ -206,7 +206,6 @@ io.on("connection", function(socket){
                         }
                         phaseHandler(currentRoom, false);
                     }
-                    result=false;
                 }
                 break;
             case 3:
@@ -221,7 +220,6 @@ io.on("connection", function(socket){
                         io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
                         phaseHandler(currentRoom, result);
                     }
-                    result=false;
                 }
                 break;
             default:
@@ -257,11 +255,15 @@ function checkForStart (room) {
 
 function checkForVote (room, role, response_type) {
     var buffer = {};
-    var response;
     var x = 0;
-    var y;                                                                          //number of players of given role
+    var y = 0;
+    
     if(role == 'peasants'){
-        y = io.sockets.adapter.rooms[room].length;
+        for (var z in io.sockets.adapter.rooms[room].sockets) {
+            if(io.sockets.sockets[z].game.alive != false) {
+                y++;
+            }
+        }
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.vote != false) {
                 buffer[z] = io.sockets.sockets[z].game.vote;
@@ -272,7 +274,7 @@ function checkForVote (room, role, response_type) {
         y = io.sockets.adapter.rooms[room][role].length;
         for (var z in io.sockets.adapter.rooms[room][role]) {
             var zz = io.sockets.adapter.rooms[room][role][z];
-            if(io.sockets.sockets[zz].game.vote != false) {                      //ERROR HERE
+            if(io.sockets.sockets[zz].game.vote != false) {
                 buffer[zz] = io.sockets.sockets[zz].game.vote;
                 x++;
             }
