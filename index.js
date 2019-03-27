@@ -330,7 +330,7 @@ function phaseHandler(room, dead){
             }
             if(y==0){
                 cleanUp(room, 'peasants');
-                break;
+                return false;
             } else {phase++;break;}
         case 3:
             y=0;
@@ -341,7 +341,7 @@ function phaseHandler(room, dead){
             }
             if(io.sockets.adapter.rooms[room].spawns.length == y){
                 cleanUp(room, 'spawns');
-                break;
+                return false;
             } else {phase=1;break;}
             break;
         default:
