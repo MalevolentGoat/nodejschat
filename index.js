@@ -115,15 +115,17 @@ io.on("connection", function(socket){
                     break;
                 case 2://inspector phase
                     if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
-                        for(var inspectors in io.sockets.adapter.rooms[currentRoom].inspectors){
-                            io.to(inspectors).emit('chat message', socket.game.username + ': ' + msg);
+                        for(var inspector in io.sockets.adapter.rooms[currentRoom].inspectors){
+                            var x = io.sockets.adapter.rooms[currentRoom].inspectors[inspector];
+                            io.to(x).emit('chat message', socket.game.username + ': ' + msg);
                         }
                     }
                     break;
                 case 3://spawn phase
                     if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
-                        for(var spawns in io.sockets.adapter.rooms[currentRoom].spawns){
-                            io.to(spawns).emit('chat message', socket.game.username + ': ' + msg);
+                        for(var spawn in io.sockets.adapter.rooms[currentRoom].spawns){
+                            var x = io.sockets.adapter.rooms[currentRoom].spawns[spawn];
+                            io.to(x).emit('chat message', socket.game.username + ': ' + msg);
                         }
                     }
                     break;
@@ -161,39 +163,55 @@ io.on("connection", function(socket){
         checkForStart(currentRoom);
     });
     socket.on('get_role', function(target){
-        io.to(socket.id).emit('reveil', { target: target, role: io.sockets.sockets[target].game.role });
+        io.to(socket.id).emit('reveil_self', { target: target, role: io.sockets.sockets[target].game.role });
     });
     socket.on('phase_vote', function(target){
-        var result;
+        var result={};
         switch(io.sockets.adapter.rooms[currentRoom].phase) {
             case 1:
                 if(socket.game.alive == true){
-                   
+                    socket.game.vote = target;
+                    console.log(socket.game.vote);
+                    console.log("phase 1");
+                    result = checkForVote(currentRoom, 'peasants', 'single');
+                    console.log(result);
+                    if(result){
+                        io.sockets.sockets[result[0]].game.alive = false;
+                        io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
+                        phaseHandler(currentRoom, result);
+                    }
                 }
                 break;
             case 2:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
                     socket.game.vote = target;
+                    console.log("phase 2");
                     result = checkForVote(currentRoom, 'inspectors', 'multi');
+                    console.log(result);
                     if(result){
                         for(var x in result){
-                            io.to(Object.keys(result)[x]).emit('reveil', { target: x, role: io.sockets.sockets[x].game.role });
+                            io.to(x).emit('reveil', { target: result[x], role: io.sockets.sockets[result[x]].game.role });
                         }
+                        phaseHandler(currentRoom, false);
                     }
-                    //call next Phase
                 }
                 break;
             case 3:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
-                    checkForVote (currentRoom, 'spawns', 'single');
+                    socket.game.vote = target;
+                    console.log("phase 3");
+                    result = checkForVote (currentRoom, 'spawns', 'single');
+                    console.log(result);
+                    if(result){
+                        io.sockets.sockets[result[0]].game.alive = false;
+                        io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
+                        phaseHandler(currentRoom, result);
+                    }
                 }
                 break;
             default:
                 console.log('Another Critical');
         }
-    });
-    socket.on('target_vote', function(target){
-        
     });
 });
 
@@ -216,20 +234,35 @@ function checkForStart (room) {
     if (x >= y && x >= 3) {
         assignRoles(y, room);
         io.sockets.adapter.rooms[room].phase = 1;
-        io.sockets.adapter.rooms[room].phase_voteList = [];
         io.to(room).emit('game_start', io.sockets.adapter.rooms[room].phase);
     }
 }
 
 function checkForVote (room, role, response_type) {
-    var buffer;
-    var response;
+    var buffer = {};
     var x = 0;
-    var y = io.sockets.adapter.rooms[room][role].length;//number of players of given role
-    for (var z in io.sockets.adapter.rooms[room].inspectors) {
-        if(io.sockets.sockets[z].game.vote != false) {
-            buffer[z] = io.sockets.sockets[z].game.vote;
-            x++;
+    var y = 0;
+    console.log('checking for votes');
+    if(role == 'peasants'){
+        for (var z in io.sockets.adapter.rooms[room].sockets) {
+            if(io.sockets.sockets[z].game.alive == true) {
+                y++;
+            }
+        }
+        for (var z in io.sockets.adapter.rooms[room].sockets) {
+            if(io.sockets.sockets[z].game.vote != false) {
+                buffer[z] = io.sockets.sockets[z].game.vote;
+                x++;
+            }
+        }
+    } else {
+        y = io.sockets.adapter.rooms[room][role].length;
+        for (var z in io.sockets.adapter.rooms[room][role]) {
+            var zz = io.sockets.adapter.rooms[room][role][z];
+            if(io.sockets.sockets[zz].game.vote != false) {
+                buffer[zz] = io.sockets.sockets[zz].game.vote;
+                x++;
+            }
         }
     }
     if(x == y) {
@@ -240,7 +273,7 @@ function checkForVote (room, role, response_type) {
                 var modeMap = {};
                 var maxCount = 1;
                 var modes = [];
-                for(var i = 0; i < buffer.length; i++)
+                for(var i in buffer)
                 {
                     var el = buffer[i];
                     if (modeMap[el] == null)
@@ -260,12 +293,72 @@ function checkForVote (room, role, response_type) {
                 }
                 if(modes.length == 1){
                     return modes;
-                } else { } //CALL NEXT PHASE BECAUSE OF TIE
+                } else { phaseHandler(room, false); }
                 break;
             default:
                 console.log('WOW!');
         }
     }
+}
+
+function phaseHandler(room, dead){
+    for(var z in io.sockets.adapter.rooms[room].sockets) {
+        io.sockets.sockets[z].game.vote = false;
+    }
+    var y;
+    var phase=io.sockets.adapter.rooms[room].phase;
+    switch(phase){
+        case 1:
+            y=0;
+            for(var x in io.sockets.adapter.rooms[room].inspectors){
+                var xx = io.sockets.adapter.rooms[room].inspectors[x];
+                if(io.sockets.sockets[xx].game.alive == true) {
+                    y++;
+                }
+            }
+            console.log(y+" Inspectors alive");
+            if(y==0){
+                phase++;
+            } else {phase++;break;}
+        case 2:
+            y=0;
+            for(var x in io.sockets.adapter.rooms[room].spawns){
+                var xx = io.sockets.adapter.rooms[room].spawns[x];
+                if(io.sockets.sockets[xx].game.alive == true) {
+                    y++;
+                }
+            }
+            console.log(y+" Spawns alive");
+            if(y==0){
+                cleanUp(room, 'peasants');
+                return false;
+            } else {phase++;break;}
+        case 3:
+            y=0;
+            z=0;
+            for(var x in io.sockets.adapter.rooms[room].sockets){
+                if(io.sockets.sockets[x].game.alive == true) {
+                    y++;
+                }
+            }
+            for(var x in io.sockets.adapter.rooms[room].spawns){
+                var xx = io.sockets.adapter.rooms[room].spawns[x];
+                if(io.sockets.sockets[xx].game.alive == true) {
+                    z++;
+                }
+            }
+            console.log(y+" Players alive");
+            console.log(z+" Spawns alive");
+            if(z == y){
+                cleanUp(room, 'spawns');
+                return false;
+            } else {phase=1;break;}
+            break;
+        default:
+            console.log('Woopsie!');
+    }
+    io.sockets.adapter.rooms[room].phase = phase;
+    io.to(room).emit('phaseHandler', {phase: phase, dead: dead});
 }
 
 function assignRoles(length, room) {
@@ -304,8 +397,19 @@ function assignRoles(length, room) {
     }
 }
 
-function removeXMLInvalidChars(string)
-{
+function cleanUp(room, winner){
+    for(var x in io.sockets.adapter.rooms[room].sockets){
+        io.sockets.sockets[x].game.role = '';
+        io.sockets.sockets[x].game.status = false;
+        io.sockets.sockets[x].game.alive = true;
+        io.sockets.sockets[x].game.vote = false;
+    }
+    io.sockets.adapter.rooms[room].phase=null;
+    console.log('And the winner is: '+winner);
+    io.to(room).emit('end', winner);
+}
+
+function removeXMLInvalidChars(string) {
     // remove everything forbidden by XML 1.0 specifications, plus the unicode replacement character U+FFFD
     var regex = /((?:[\0-\x08\x0B\f\x0E-\x1F\uFFFD\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/g;
     string = string.replace(regex, "");
