@@ -281,7 +281,7 @@ function checkForVote (room, role, response_type) {
                 var modeMap = {};
                 var maxCount = 1;
                 var modes = [];
-                for(for i in buffer)
+                for(var i in buffer)
                 {
                     var el = buffer[i];
                     if (modeMap[el] == null)
