@@ -277,6 +277,8 @@ function checkForVote (room, role, response_type) {
             }
         }
     }
+    console.log(x);
+    console.log(y);
     if(x == y) {
         switch(response_type){
             case 'multi':
