@@ -312,7 +312,8 @@ function phaseHandler(room, dead){
         case 1:
             y=0;
             for(var x in io.sockets.adapter.rooms[room].inspectors){
-                if(io.sockets.sockets[x].game.alive == true) {
+                var xx = io.sockets.adapter.rooms[room].inspectors[x];
+                if(io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
@@ -322,7 +323,8 @@ function phaseHandler(room, dead){
         case 2:
             y=0;
             for(var x in io.sockets.adapter.rooms[room].spawns){
-                if(io.sockets.sockets[x].game.alive == true) {
+                var xx = io.sockets.adapter.rooms[room].spawns[x];
+                if(io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
