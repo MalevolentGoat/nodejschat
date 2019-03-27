@@ -181,7 +181,9 @@ io.on("connection", function(socket){
             case 1:
                 if(socket.game.alive == true){
                     socket.game.vote = target;
+                    console.log(socket.game.vote);
                     result = checkForVote(currentRoom, 'peasants', 'single');
+                    console.log(result);
                     if(result){
                         io.sockets.sockets[result].game.alive = false;
                         phaseHandler(currentRoom);
