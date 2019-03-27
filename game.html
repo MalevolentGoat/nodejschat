@@ -239,16 +239,22 @@
             switch(msg.phase){
                 case 1:
                     if(alive == true){
+                        $('#messages').append($('<li>').text("It's your Turn"));
+                        $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
                         document.getElementById('overlay').style.display = "none";
                     } else { document.getElementById('overlay').style.display = "block"; }
                     break;
                 case 2:
                     if(ownrole == 'Inspector' && alive == true) {
+                        $('#messages').append($('<li>').text("It's your Turn, Inspector"));
+                        $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
                         document.getElementById('overlay').style.display = "none";
                     } else { document.getElementById('overlay').style.display = "block"; }
                     break;
                 case 3:
                     if(ownrole == 'Spawn' && alive == true) {
+                        $('#messages').append($('<li>').text("It's your Turn, Spawn"));
+                        $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
                         document.getElementById('overlay').style.display = "none";
                     } else { document.getElementById('overlay').style.display = "block"; }
                     break;
