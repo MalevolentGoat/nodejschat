@@ -94,7 +94,18 @@ io.on("connection", function(socket){
           io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
         });
     });
-    
+    socket.on('leave', function(){
+        io.to(currentRoom).emit('discon message', socket.id);
+        socket.leave(currentRoom);
+        socket.game.role = '';
+        socket.game.status = false;
+        socket.game.alive = true;
+        socket.game.vote = false;
+        socket.join('Lobby', function(){
+            currentRoom = 'Lobby';
+            io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
+        });
+    });
     socket.on('disconnecting', function(){
         io.to(currentRoom).emit('discon message', socket.id);
         socket.leave(currentRoom);
@@ -325,6 +336,18 @@ function phaseHandler(room, dead){
     switch(phase){
         case 1:
             y=0;
+            for(var v in io.sockets.adapter.rooms[room].spawns){
+                var vv = io.sockets.adapter.rooms[room].spawns[v];
+                if(io.sockets.sockets[vv].game.alive == true) {
+                    y++;
+                }
+            }
+            console.log(y+" Spawns alive");
+            if(y==0){
+                cleanUp(room, 'peasants');
+                return false;
+            }
+            y=0;
             for(var x in io.sockets.adapter.rooms[room].inspectors){
                 var xx = io.sockets.adapter.rooms[room].inspectors[x];
                 if(io.sockets.sockets[xx].game.alive == true) {
@@ -334,7 +357,7 @@ function phaseHandler(room, dead){
             console.log(y+" Inspectors alive");
             if(y==0){
                 phase++;
-            } else {phase++;break;}
+            } else {phase++;io.to(room).emit('phase', phase);break;}
         case 2:
             y=0;
             for(var x in io.sockets.adapter.rooms[room].spawns){
@@ -347,7 +370,7 @@ function phaseHandler(room, dead){
             if(y==0){
                 cleanUp(room, 'peasants');
                 return false;
-            } else {phase++;break;}
+            } else {phase++;io.to(room).emit('phase', phase);break;}
         case 3:
             y=0;
             z=0;
@@ -367,7 +390,7 @@ function phaseHandler(room, dead){
             if(z == y){
                 cleanUp(room, 'spawns');
                 return false;
-            } else {phase=1;break;}
+            } else {phase=1;io.to(room).emit('phase', phase);break;}
             break;
         default:
             console.log('Woopsie!');
