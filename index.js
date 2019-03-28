@@ -258,20 +258,7 @@ function checkForStart (room) {
 }
 
 function checkForVote (room) {
-    var role;
-    switch(io.sockets.adapter.rooms[room].phase){
-        case 1:
-            role = "Peasants";
-            break;
-        case 2:
-            role = "Inspectors";
-            break;
-        case 3:
-            role = "Spawns";
-            break;
-        default:
-            console.log("Wowzers!");
-    }
+    var role = io.sockets.adapter.rooms[room].phase;
     var buffer = {};
     var x = 0;
     var y = 0;
