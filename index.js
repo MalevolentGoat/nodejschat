@@ -193,14 +193,12 @@ io.on("connection", function(socket){
     });
     socket.on('phase_vote', function(target){
         var result={};
-        switch(io.sockets.adapter.rooms[currentRoom].phase) {
+        var phase = io.sockets.adapter.rooms[currentRoom].phase;
+        switch(phase) {
             case 1:
                 if(socket.game.alive == true){
                     socket.game.vote = target;
-                    console.log(socket.game.vote);
-                    console.log("phase 1");
-                    result = checkForVote(currentRoom, 'peasants', 'single');
-                    console.log(result);
+                    result = checkForVote(currentRoom);
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
                         io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
@@ -211,9 +209,7 @@ io.on("connection", function(socket){
             case 2:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
                     socket.game.vote = target;
-                    console.log("phase 2");
-                    result = checkForVote(currentRoom, 'inspectors', 'multi');
-                    console.log(result);
+                    result = checkForVote(currentRoom);
                     if(result){
                         for(var x in result){
                             io.to(x).emit('reveil', { target: result[x], role: io.sockets.sockets[result[x]].game.role });
@@ -225,9 +221,7 @@ io.on("connection", function(socket){
             case 3:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
                     socket.game.vote = target;
-                    console.log("phase 3");
-                    result = checkForVote (currentRoom, 'spawns', 'single');
-                    console.log(result);
+                    result = checkForVote (currentRoom);
                     if(result){
                         io.sockets.sockets[result[0]].game.alive = false;
                         io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
@@ -240,7 +234,6 @@ io.on("connection", function(socket){
         }
     });
 });
-
 function getUserlistInRoom(room) {
     var conList = {};
     for (var socketID in io.sockets.adapter.rooms[room].sockets) {                      //iterates throug sockets in a room
@@ -264,12 +257,13 @@ function checkForStart (room) {
     }
 }
 
-function checkForVote (room, role, response_type) {
+function checkForVote (room) {
+    var role = io.sockets.adapter.rooms[room].phase;
     var buffer = {};
     var x = 0;
     var y = 0;
     console.log('checking for votes');
-    if(role == 'peasants'){
+    if(role == 1){
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.alive == true) {
                 y++;
@@ -292,37 +286,33 @@ function checkForVote (room, role, response_type) {
         }
     }
     if(x == y) {
-        switch(response_type){
-            case 'multi':
-                return buffer;
-            case 'single':
-                var modeMap = {};
-                var maxCount = 1;
-                var modes = [];
-                for(var i in buffer)
+        if(role == 2){
+            return buffer;
+        } else {
+            var modeMap = {};
+            var maxCount = 1;
+            var modes = [];
+            for(var i in buffer)
+            {
+                var el = buffer[i];
+                if (modeMap[el] == null)
+                    modeMap[el] = 1;
+                else
+                    modeMap[el]++;
+                if (modeMap[el] > maxCount)
                 {
-                    var el = buffer[i];
-                    if (modeMap[el] == null)
-                        modeMap[el] = 1;
-                    else
-                        modeMap[el]++;
-                    if (modeMap[el] > maxCount)
-                    {
-                        modes = [el];
-                        maxCount = modeMap[el];
-                    }
-                    else if (modeMap[el] == maxCount)
-                    {
-                        modes.push(el);
-                        maxCount = modeMap[el];
-                    }
+                    modes = [el];
+                    maxCount = modeMap[el];
                 }
-                if(modes.length == 1){
-                    return modes;
-                } else { phaseHandler(room, false); }
-                break;
-            default:
-                console.log('WOW!');
+                else if (modeMap[el] == maxCount)
+                {
+                    modes.push(el);
+                    maxCount = modeMap[el];
+                }
+            }
+            if(modes.length == 1){
+                return modes;
+            } else { phaseHandler(room, false); return false; }
         }
     }
 }
