@@ -19,21 +19,36 @@ var bodyParser  = require('body-parser');
 var jwt         = require('jsonwebtoken');
 
 //Set Parameters for database
-var con = mysql.createConnection({
+var con_config = {
     host: "localhost",
     user: "admin",
     pass: "",
     port: "3306",
     database: "userbase"
-});
+}
+var con;
+function handleDisconnect(){
+    con = mysql.createConnection(con_config);
+    con.connect( function onConnect(err){
+        if (err) {
+            console.log("DBCONNECT_ERROR: ", err);
+            setTimeout(handleDisconnect, 10000);
+        }
+    });
+    con.on('error', function onError(err){
+        console.log('db error', err);
+        if(err.code == 'PROTOCOL_CONNECTION_LOST'){
+            handleDisconnect();
+        } else {
+            throw err;
+        }
+    })
+}
+handleDisconnect();
 
 app.use(bodyParser.urlencoded({ extended : false }));   //this parses the post variables into js compatible strings/arrays
 //app.use(bodyParser.json());                           //Maybe? NO!
 //app.use(require('express').static(__dirname, { dotfile: 'allow' }));        //this makes the file directory public, comment out in final release
-
-con.connect(function(err) {
-    if (err) throw err;
-});
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');              //calling the domain sends the landing page
