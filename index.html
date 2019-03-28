@@ -110,15 +110,24 @@
                        d="M 108.19155,90.73081 64,4 15.458977,99.26712 c 19.052314,-5.10183 34.86033,0.44681 31.686784,9.83724"/>
                 </g>
                 <g id="links">
-                    <circle onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(1)" class="link" id="link_1"
+                    <defs>
+                        <filter id="glow" x="-150%" y="-150%" width="400%" height="400%">
+                            <feGaussianBlur stdDeviation="3" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <circle filter="url(#glow)" onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(1)" class="link" id="link_1"
                         cx="93.225082"
                         cy="32.8452"
                         r="3" />
-                    <circle onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(2)" class="link" id="link_2"
+                    <circle filter="url(#glow)" onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(2)" class="link" id="link_2"
                         cx="45.961941"
                         cy="111.91334"
                         r="3" />
-                    <circle onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(3)" class="link" id="link_3"
+                    <circle filter="url(#glow)" onmouseover="mouseOverEffect(this)" onmouseout="mouseOutEffect(this)" onmouseup="mouseClick(3)" class="link" id="link_3"
                         cx="17.147339"
                         cy="71.25468"
                         r="3" />
