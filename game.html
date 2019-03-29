@@ -174,7 +174,7 @@
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         $('#grid_container').on('click', '.grid_content', function(event){
-            button_toggle = event.target.id;
+            button_toggle = event.target;
             button_toggle.style.background = "#1b4b1b";
             socket.emit('phase_vote', event.target.getAttribute('name'));
         });
