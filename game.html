@@ -255,8 +255,10 @@
             }
         });
         socket.on('phaseHandler', function(msg){
-            button_toggle.style.background = "#41bb41";
-            button_toggle = false;
+            if(button_toggle != false){
+                button_toggle.style.background = "#41bb41";
+                button_toggle = false;
+            }
             for(var i in msg.dead){
                 if(msg.dead[i]==socket.id){
                     document.getElementById('overlay').innerHTML="You are dead!";
