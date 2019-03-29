@@ -262,6 +262,7 @@
                     alive=false;
                 }
                 $('button[name="' + msg.dead[i] + '"]').attr('disabled', true);
+                $('button[name="' + msg.dead[i] + '"]').attr('style', "background: #ccc");
             }
             console.log(msg.phase);
             switch(msg.phase){
