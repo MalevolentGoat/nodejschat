@@ -107,6 +107,7 @@
       
       var selectedRow;
       var ownrole;
+      var button_toggle;
       var alive = true;
       document.getElementById('infotext').innerHTML = "Join a room to play.";
         
@@ -127,7 +128,6 @@
       }
       $(function () {
         var socket = io();
-        var button_toggle;
         function getCookie(name) {
           var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
           if (match) return match[2];
@@ -227,6 +227,7 @@
           }
         });
         socket.on('game_start', function(phase){
+          button_toggle=false;
           document.getElementById('infotext').innerHTML = "Phase: Day. The Peasants should discuss and vote who the Spawn is and banish him from the town!";
           var list_items = document.getElementById('userlist').getElementsByTagName("li");
           $('#messages').append($('<li>').text('Game has started'));
@@ -319,6 +320,7 @@
             $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
             $('#leave').attr('disabled', false);
             ownrole=undefined;
+            button_toggle=false;
             alive=true;
         });
       });
