@@ -260,8 +260,9 @@
                     document.getElementById('overlay').innerHTML="You are dead!";
                     alive=false;
                 }
-                $('button[name="' + msg.dead[i] + '"]').attr('disabled', true);
+                $('button[name="' + msg.dead[i] + '"]').attr('disabled', 'disabled');
             }
+            console.log(button_toggle);
             if(button_toggle != false){
                 if(button_toggle.disabled != 'disabled'){
                    button_toggle.style.background = "#41bb41";
