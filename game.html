@@ -175,10 +175,10 @@
         });
         $('#grid_container').on('click', '.grid_content', function(event){
             if(button_toggle!=false){
-                button_toggle.style.background = "#41bb41";
+                button_toggle.style.boxShadow = "none";
             }
             button_toggle = event.target;
-            button_toggle.style.background = "#1b4b1b";
+            button_toggle.style.boxShadow = "0px 0px 0px 5px red";
             socket.emit('phase_vote', event.target.getAttribute('name'));
         });
         socket.on('get_username', function(){
@@ -255,19 +255,13 @@
             }
         });
         socket.on('phaseHandler', function(msg){
+            button_toggle.style.boxShadow = "none";
             for(var i in msg.dead){
                 if(msg.dead[i]==socket.id){
                     document.getElementById('overlay').innerHTML="You are dead!";
                     alive=false;
                 }
                 $('button[name="' + msg.dead[i] + '"]').attr('disabled', 'disabled');
-            }
-            console.log(button_toggle);
-            if(button_toggle != false){
-                if(button_toggle.disabled != 'disabled'){
-                   button_toggle.style.background = "#41bb41";
-                }
-                button_toggle = false;
             }
             console.log(msg.phase);
             switch(msg.phase){
