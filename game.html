@@ -256,7 +256,7 @@
         });
         socket.on('phaseHandler', function(msg){
             if(button_toggle != false){
-                if(button_toggle.disabled == false){
+                if(button_toggle.disabled != 'disabled'){
                    button_toggle.style.background = "#41bb41";
                 }
                 button_toggle = false;
