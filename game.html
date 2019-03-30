@@ -236,7 +236,7 @@
           document.getElementById('grid_container').style.display = "grid";
           for (var x=0; x<list_items.length; x++) {
               if(list_items[x].id == socket.id) {
-                  $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '" disabled style="background:#89ceff;">' + list_items[x].innerHTML + '<p>You are:</p></button>'));
+                  $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '" disabled style="background:#89ceff;">' + list_items[x].innerHTML + '<br>You are:</button>'));
               } else {
                   $('#grid_container').append($('<button class="grid_content" name="' + list_items[x].id + '">' + list_items[x].innerHTML + '</button>'));
               }
@@ -250,13 +250,15 @@
         socket.on('reveil', function(msg){
             if(msg.target!=socket.id){
                 if(document.getElementsByName(msg.target)[0].children.length == 0) {
-                   document.getElementsByName(msg.target)[0].innerHTML += '<p>' + msg.role + '</p>';
+                   document.getElementsByName(msg.target)[0].innerHTML += '<br>' + msg.role;
                 }
             }
         });
         socket.on('phaseHandler', function(msg){
             if(button_toggle != false){
-                button_toggle.style.background = "#41bb41";
+                if(button_toggle.disabled == false){
+                   button_toggle.style.background = "#41bb41";
+                }
                 button_toggle = false;
             }
             for(var i in msg.dead){
