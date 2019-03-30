@@ -178,7 +178,7 @@ io.on("connection", function(socket){
             socket.game.alive = true;
             socket.game.vote = false;
             for(var socketID in io.sockets.adapter.rooms[currentRoom].sockets){
-                socketID.game.status = false;
+                io.sockets.sockets[socketID].game.status = false;
             }
         });
         //console.log(io.sockets.adapter.rooms[table_name]);                          //Debug function to show all players in this room
