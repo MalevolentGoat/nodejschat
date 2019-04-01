@@ -181,6 +181,9 @@
             button_toggle.style.boxShadow = "0px 0px 0px 5px red";
             socket.emit('phase_vote', event.target.getAttribute('name'));
         });
+        socket.on('userLoggedIn', function(){
+            console.log('xxxxxxx');
+        });
         socket.on('get_username', function(){
             var username = getCookie("token");
             socket.emit('username', username);

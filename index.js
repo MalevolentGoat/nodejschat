@@ -56,6 +56,7 @@ app.get('/', function(req, res){
 
 app.post('/login', function (req, res){
     var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + removeXMLInvalidChars(req.body.email) + "'";
+    console.log(io.sockets.sockets);
     req.body.pass = crypto.MD5(req.body.pass).toString();
     con.query(query_login, function (err, result) {
         try{
@@ -96,7 +97,7 @@ io.on("connection", function(socket){
             }
         }
         if(loggedIn){
-            res.sendFile(__dirname + '/index.html')
+            socket.emit('userLoggedIn');
         } else {
             socket.game.username = verifiedToken.user;
             console.log(socket.game.username);
