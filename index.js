@@ -87,9 +87,11 @@ io.on("connection", function(socket){
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
+        console.log(verifiedToken);
         var loggedIn=false;
         for(var i in io.sockets.sockets) {
             if(io.sockets.sockets[i].game.username==verifiedToken){
+                console.log(io.sockets.sockets[i].game.username);
                 loggedIn=true;
             }
         }
