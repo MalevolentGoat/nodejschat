@@ -90,7 +90,7 @@ io.on("connection", function(socket){
         console.log(verifiedToken);
         var loggedIn=false;
         for(var i in io.sockets.sockets) {
-            if(io.sockets.sockets[i].game.username==verifiedToken){
+            if(io.sockets.sockets[i].game.username==verifiedToken.user){
                 console.log(io.sockets.sockets[i].game.username);
                 loggedIn=true;
             }
