@@ -87,12 +87,22 @@ io.on("connection", function(socket){
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
-        socket.game.username = verifiedToken.user;
-        console.log(socket.game.username);
-        socket.join('Lobby', function(){
-          currentRoom = 'Lobby';
-          io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
-        });
+        var loggedIn=false;
+        for(var i in io.sockets.sockets) {
+            if(io.sockets.sockets[i].game.username==verifiedToken){
+                loggedIn=true;
+            }
+        }
+        if(loggedIn){
+            res.sendFile(__dirname + '/index.html')
+        } else {
+            socket.game.username = verifiedToken.user;
+            console.log(socket.game.username);
+            socket.join('Lobby', function(){
+                currentRoom = 'Lobby';
+                io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
+            });
+        }
     });
     socket.on('leave', function(){
         io.to(currentRoom).emit('discon message', socket.id);
