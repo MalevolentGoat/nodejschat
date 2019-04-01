@@ -93,7 +93,7 @@
         <p id="room_name">Room: Lobby</p>
       </div>
       <div id="page4">
-        <button id="leave" style="width: 100%">Leave Room</button>
+        <button id="leave" style="width: 100%" disabled>Leave Room</button>
       </div>
     </div>
     <div id="chat_boxes">
@@ -155,6 +155,7 @@
           if (selectedRow != null) {
               socket.emit('t_create', selectedRow.id);
               selectedRow = null;
+              $('#leave').attr('disabled', false);
           }
           return false;
         });
@@ -164,6 +165,7 @@
             document.getElementById('overlay').style.display = "none";
             document.getElementById('start_button').style.display = "none";
             document.getElementById('infotext').innerHTML = "Join a room to play.";
+            $('#leave').attr('disabled', true);
             socket.emit('leave');
             return false;
         })

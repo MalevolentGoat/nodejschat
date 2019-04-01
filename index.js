@@ -70,7 +70,7 @@ app.post('/login', function (req, res){
                     }
                 }
                 if(loggedIn){
-                    res.sendStatus(418);
+                    res.sendFile(__dirname + '/index.html');
                 } else {
                     var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
                     res.cookie("token", token);                             //Token is saved in clients local storage
