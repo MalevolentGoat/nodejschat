@@ -168,7 +168,7 @@
             $('#leave').attr('disabled', true);
             socket.emit('leave');
             return false;
-        })
+        });
         $('#start_button').on('click', function(){
             document.getElementById("start_button").style.display = "none";
             socket.emit('vote');
