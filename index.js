@@ -56,15 +56,26 @@ app.get('/', function(req, res){
 
 app.post('/login', function (req, res){
     var query_login = "SELECT password, name FROM `user` WHERE `mail`='" + removeXMLInvalidChars(req.body.email) + "'";
-    console.log(io.sockets.sockets);
     req.body.pass = crypto.MD5(req.body.pass).toString();
     con.query(query_login, function (err, result) {
         try{
             if(err) throw err;
             if(result[0].password == req.body.pass) {
-                var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
-                res.cookie("token", token);                             //Token is saved in clients local storage
-                res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
+                var loggedIn=false;
+                for(var i in io.sockets.sockets) {
+                    if(io.sockets.sockets[i].game.username==result[0].name){
+                        console.log(io.sockets.sockets[i].game.username);
+                        loggedIn=true;
+                        break;
+                    }
+                }
+                if(loggedIn){
+                    res.sendStatus(418);
+                } else {
+                    var token = jwt.sign({ user: result[0].name}, 'superSecretPassphrase');
+                    res.cookie("token", token);                             //Token is saved in clients local storage
+                    res.sendFile(__dirname + '/game.html');                 //send the actual game, hidden behind authentication
+                }
             } else {
                 res.sendStatus(400);
             }
@@ -88,24 +99,12 @@ io.on("connection", function(socket){
     
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
-        console.log(verifiedToken);
-        var loggedIn=false;
-        for(var i in io.sockets.sockets) {
-            if(io.sockets.sockets[i].game.username==verifiedToken.user){
-                console.log(io.sockets.sockets[i].game.username);
-                loggedIn=true;
-            }
-        }
-        if(loggedIn){
-            socket.emit('userLoggedIn');
-        } else {
-            socket.game.username = verifiedToken.user;
-            console.log(socket.game.username);
-            socket.join('Lobby', function(){
-                currentRoom = 'Lobby';
-                io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
-            });
-        }
+        socket.game.username = verifiedToken.user;
+        console.log(socket.game.username);
+        socket.join('Lobby', function(){
+            currentRoom = 'Lobby';
+            io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
+        });
     });
     socket.on('leave', function(){
         io.to(currentRoom).emit('discon message', socket.id);
