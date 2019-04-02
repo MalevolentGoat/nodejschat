@@ -187,23 +187,48 @@ io.on("connection", function(socket){
     });
     //room_create
     socket.on('t_create', function(table_name) {
-        io.to(currentRoom).emit('discon message', socket.id);
-        socket.leave(currentRoom);
-        socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
-            currentRoom = table_name;
-            io.to(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
-            socket.game.role = '';
-            socket.game.alive = true;
-            socket.game.vote = false;
-            for(var socketID in io.sockets.adapter.rooms[currentRoom].sockets){
-                io.sockets.sockets[socketID].game.status = false;
+        var exist=false;
+        for(var x in io.sockets.adapter.rooms){
+            if(io.sockets.adapter.rooms[x]==table_name){
+                exist=true;
+                break;
             }
-        });
+        }
+        if(!exist){
+            io.to(currentRoom).emit('discon message', socket.id);
+            socket.leave(currentRoom);
+            socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
+                currentRoom = table_name;
+                io.to(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
+                socket.game.role = '';
+                socket.game.alive = true;
+                socket.game.vote = false;
+                for(var socketID in io.sockets.adapter.rooms[currentRoom].sockets){
+                    io.sockets.sockets[socketID].game.status = false;
+                }
+            });
+        } else { socket.emit('alert', "Room exists already!"); }
+
         //console.log(io.sockets.adapter.rooms[table_name]);                          //Debug function to show all players in this room
         //console.log(io.sockets.sockets);                                            //Debug function to show all sockets
         //console.log(socket.rooms);                                                  //Debug to show the socket's rooms
     });
-    //room_join not needed same code as room_create
+    socket.on('t_join', function(table_name){
+        if(io.sockets.adapter.rooms[table_name].phase==undefined) {
+            io.to(currentRoom).emit('discon message', socket.id);
+            socket.leave(currentRoom);
+            socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
+                currentRoom = table_name;
+                io.to(currentRoom).emit('room_joined', { msg: currentRoom, data: getUserlistInRoom(currentRoom)});
+                socket.game.role = '';
+                socket.game.alive = true;
+                socket.game.vote = false;
+                for(var socketID in io.sockets.adapter.rooms[currentRoom].sockets){
+                    io.sockets.sockets[socketID].game.status = false;
+                }
+            });
+        } else { socket.emit('alert', "Game has already started!"); }
+    });
     socket.on('vote', function() {
         socket.game.status = true;
         checkForStart(currentRoom);
