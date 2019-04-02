@@ -177,10 +177,10 @@ io.on("connection", function(socket){
     
     //room_refresh
     socket.on('t_refresh', function() {
-        var list=[];
+        var list={};
         for(var x in io.sockets.adapter.rooms){
             if(typeof io.sockets.adapter.rooms[x].phase=="undefined" && x != 'Lobby' && x.length <= 18){
-                list.push(io.sockets.adapter.rooms[x]);
+                list.append(io.sockets.adapter.rooms[x]);
             }
         }
         socket.emit('room_list', list);
