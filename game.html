@@ -203,7 +203,8 @@
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         socket.on('discon message', function(msg){
-          $('#' + msg).remove();
+          $('#' + msg).remove(); 
+          document.getElementsByName(msg)[0].remove();
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         socket.on('room_list', function(list){
