@@ -179,8 +179,8 @@ io.on("connection", function(socket){
     socket.on('t_refresh', function() {
         var list={};
         for(var x in io.sockets.adapter.rooms){
-            if(io.sockets.adapter.rooms[x].phase!=undefined){
-                list.append(io.sockets.adapter.rooms[x]);
+            if(io.sockets.adapter.rooms[x].phase!=undefined && x != 'Lobby' && x.length <= 18){
+                list.push(io.sockets.adapter.rooms[x]);
             }
         }
         console.log(io.sockets.adapter.rooms);
