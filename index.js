@@ -183,7 +183,9 @@ io.on("connection", function(socket){
                 list.append(io.sockets.adapter.rooms[x]);
             }
         }
-        socket.emit('room_list', list);
+        console.log(io.sockets.adapter.rooms);
+        console.log(list);
+        socket.emit('room_list', {pre: io.sockets.adapter.rooms, aff: list});
     });
     //room_create
     socket.on('t_create', function(table_name) {
