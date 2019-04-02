@@ -177,7 +177,13 @@ io.on("connection", function(socket){
     
     //room_refresh
     socket.on('t_refresh', function() {
-        socket.emit('room_list', io.sockets.adapter.rooms);
+        var list={};
+        for(var x in io.sockets.adapter.rooms){
+            if(io.sockets.adapter.rooms[x].phase!=undefined){
+                list.append(io.sockets.adapter.rooms[x]);
+            }
+        }
+        socket.emit('room_list', list);
     });
     //room_create
     socket.on('t_create', function(table_name) {
@@ -456,7 +462,7 @@ function cleanUp(room, winner){
         io.sockets.sockets[x].game.alive = true;
         io.sockets.sockets[x].game.vote = false;
     }
-    io.sockets.adapter.rooms[room].phase=null;
+    io.sockets.adapter.rooms[room].phase=undefined;
     console.log('And the winner is: '+winner);
     io.to(room).emit('end', winner);
 }
