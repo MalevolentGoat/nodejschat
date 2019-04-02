@@ -180,7 +180,7 @@ io.on("connection", function(socket){
         var list={};
         for(var x in io.sockets.adapter.rooms){
             console.log("DO U EVEN LIFT?" + x);
-            if(io.sockets.adapter.rooms[x].phase!=undefined && x != 'Lobby' && x.length <= 18){
+            if(typeof io.sockets.adapter.rooms[x].phase!="undefined" && x != 'Lobby' && x.length <= 18){
                 console.log("I LIFT BRO!");
                 list.push(io.sockets.adapter.rooms[x]);
             }
