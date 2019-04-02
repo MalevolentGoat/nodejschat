@@ -187,14 +187,7 @@ io.on("connection", function(socket){
     });
     //room_create
     socket.on('t_create', function(table_name) {
-        var exist=false;
-        for(var x in io.sockets.adapter.rooms){
-            if(io.sockets.adapter.rooms[x]==table_name){
-                exist=true;
-                break;
-            }
-        }
-        if(!exist){
+        if(!io.sockets.adapter.rooms[table_name]){
             io.to(currentRoom).emit('discon message', socket.id);
             socket.leave(currentRoom);
             socket.join(table_name, function(){                                           //asynchronous, therefore use this style of coding
