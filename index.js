@@ -121,6 +121,7 @@ io.on("connection", function(socket){
     socket.on('disconnecting', function(){
         io.to(currentRoom).emit('discon message', socket.id);
         socket.leave(currentRoom);
+        //function to check the votes after someone dc'd
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
