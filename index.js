@@ -183,6 +183,7 @@ io.on("connection", function(socket){
                 list[x] = io.sockets.adapter.rooms[x].length;
             }
         }
+        console.log(list);
         socket.emit('room_list', list);
     });
     //room_create
