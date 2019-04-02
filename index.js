@@ -177,17 +177,13 @@ io.on("connection", function(socket){
     
     //room_refresh
     socket.on('t_refresh', function() {
-        var list={};
+        var list=[];
         for(var x in io.sockets.adapter.rooms){
-            console.log("DO U EVEN LIFT?" + x);
-            if(typeof io.sockets.adapter.rooms[x].phase!="undefined" && x != 'Lobby' && x.length <= 18){
-                console.log("I LIFT BRO!");
+            if(typeof io.sockets.adapter.rooms[x].phase=="undefined" && x != 'Lobby' && x.length <= 18){
                 list.push(io.sockets.adapter.rooms[x]);
             }
         }
-        console.log(io.sockets.adapter.rooms);
-        console.log(list);
-        socket.emit('room_list', {pre: io.sockets.adapter.rooms, aff: list});
+        socket.emit('room_list', list);
     });
     //room_create
     socket.on('t_create', function(table_name) {

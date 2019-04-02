@@ -208,14 +208,9 @@
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         socket.on('room_list', function(list){
-          console.log(list.pre);
-          console.log(list.aff);
           $('#table_body').empty();
-          for (var x in list.aff) {
-            console.log(list.aff[x]);
-            if (x != 'Lobby' && x.length <= 18) {
-                $('#table_body').append('<tr onclick="rowSel(' + x + ')" id="' + x + '"><td>' + x + '</td><td>' + list.aff[x].length + '</td></tr>');
-            }
+          for (var x in list) {
+            $('#table_body').append('<tr onclick="rowSel(' + x + ')" id="' + x + '"><td>' + x + '</td><td>' + list.length + '</td></tr>');
           }
         });
         socket.on('room_joined', function(room_name){
