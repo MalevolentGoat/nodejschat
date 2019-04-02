@@ -180,7 +180,7 @@ io.on("connection", function(socket){
         var list={};
         for(var x in io.sockets.adapter.rooms){
             if(typeof io.sockets.adapter.rooms[x].phase=="undefined" && x != 'Lobby' && x.length <= 18){
-                list.append(io.sockets.adapter.rooms[x]);
+                list[x] = io.sockets.adapter.rooms[x].length;
             }
         }
         socket.emit('room_list', list);
