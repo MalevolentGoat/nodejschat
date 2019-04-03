@@ -384,9 +384,11 @@ function checkForVote (room, phase) {
             }
         }
     }
-    console.log(io.sockets.adapter.rooms[room].Spawn.length);
-    if(io.sockets.adapter.rooms[room].Spawn.length==0){
-        cleanUp(room, 'Peasant');
+    if(io.sockets.adapter.rooms[room].Spawn!=undefined){
+        console.log(io.sockets.adapter.rooms[room].Spawn.length);
+        if(io.sockets.adapter.rooms[room].Spawn.length==0){
+            cleanUp(room, 'Peasant');
+        }
     }
 }
 
