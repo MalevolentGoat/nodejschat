@@ -121,6 +121,7 @@ io.on("connection", function(socket){
     socket.on('disconnecting', function(){
         io.to(currentRoom).emit('discon message', socket.id);
         if(io.sockets.adapter.rooms[currentRoom].phase!=undefined){
+            socket.game.alive=false;
             io.sockets.adapter.rooms[currentRoom][socket.game.role]=io.sockets.adapter.rooms[currentRoom][socket.game.role].filter(item=>item!=socket.id);
             checkForVote(currentRoom, io.sockets.adapter.rooms[currentRoom].phase);
         }
