@@ -150,23 +150,23 @@ io.on("connection", function(socket){
             }
         } else if (io.sockets.adapter.rooms[currentRoom].phase != undefined) {
             switch (io.sockets.adapter.rooms[currentRoom].phase) {
-                case 1://peasant phase
+                case 1://Peasant phase
                     if(socket.game.alive == true){
                        io.to(currentRoom).emit('chat message', socket.game.username + ': ' + msg);
                     }
                     break;
                 case 2://inspector phase
-                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
-                        for(var inspector in io.sockets.adapter.rooms[currentRoom].inspectors){
-                            var x = io.sockets.adapter.rooms[currentRoom].inspectors[inspector];
+                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].Inspector.includes(socket.id)){
+                        for(var inspector in io.sockets.adapter.rooms[currentRoom].Inspector){
+                            var x = io.sockets.adapter.rooms[currentRoom].Inspector[inspector];
                             io.to(x).emit('chat message', socket.game.username + ': ' + msg);
                         }
                     }
                     break;
                 case 3://spawn phase
-                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
-                        for(var spawn in io.sockets.adapter.rooms[currentRoom].spawns){
-                            var x = io.sockets.adapter.rooms[currentRoom].spawns[spawn];
+                    if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].Spawn.includes(socket.id)){
+                        for(var spawn in io.sockets.adapter.rooms[currentRoom].Spawn){
+                            var x = io.sockets.adapter.rooms[currentRoom].Spawn[spawn];
                             io.to(x).emit('chat message', socket.game.username + ': ' + msg);
                         }
                     }
@@ -244,13 +244,13 @@ io.on("connection", function(socket){
                 }
                 break;
             case 2:
-                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
+                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].Inspector.includes(socket.id)){
                     socket.game.vote = target;
                     checkForVote(currentRoom, 2);
                 }
                 break;
             case 3:
-                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
+                if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].Spawn.includes(socket.id)){
                     socket.game.vote = target;
                     checkForVote (currentRoom, 3);
                 }
@@ -293,22 +293,22 @@ function checkForVote (room, phase) {
     var flag=true;
     switch(phase){
         case 1:
-            role='peasants';
+            role='Peasant';
             response_type='single';
             break;
         case 2:
-            role='inspectors';
+            role='Inspector';
             response_type='mulit';
             break;
         case 3:
-            role='spawns';
+            role='Spawn';
             response_type='single';
             break;
         default:
             console.log('Critical Error!');
     }
     console.log('checking for votes');
-    if(role == 'peasants'){
+    if(role == 'Peasant'){
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.alive == true) {
                 y++;
@@ -394,20 +394,20 @@ function phaseHandler(room, dead){
     switch(phase){
         case 1:
             y=0;
-            for(var v in io.sockets.adapter.rooms[room].spawns){
-                var vv = io.sockets.adapter.rooms[room].spawns[v];
+            for(var v in io.sockets.adapter.rooms[room].Spawn){
+                var vv = io.sockets.adapter.rooms[room].Spawn[v];
                 if(io.sockets.sockets[vv].game.alive == true) {
                     y++;
                 }
             }
-            console.log(y+" Spawns alive");
+            console.log(y+" Spawn alive");
             if(y==0){
-                cleanUp(room, 'peasants');
+                cleanUp(room, 'Peasant');
                 return false;
             }
             y=0;
-            for(var x in io.sockets.adapter.rooms[room].inspectors){
-                var xx = io.sockets.adapter.rooms[room].inspectors[x];
+            for(var x in io.sockets.adapter.rooms[room].Inspector){
+                var xx = io.sockets.adapter.rooms[room].Inspector[x];
                 if(io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
@@ -418,15 +418,15 @@ function phaseHandler(room, dead){
             } else {phase++;io.to(room).emit('phase', phase);break;}
         case 2:
             y=0;
-            for(var x in io.sockets.adapter.rooms[room].spawns){
-                var xx = io.sockets.adapter.rooms[room].spawns[x];
+            for(var x in io.sockets.adapter.rooms[room].Spawn){
+                var xx = io.sockets.adapter.rooms[room].Spawn[x];
                 if(io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
-            console.log(y+" Spawns alive");
+            console.log(y+"  alive");
             if(y==0){
-                cleanUp(room, 'peasants');
+                cleanUp(room, 'Peasant');
                 return false;
             } else {phase++;io.to(room).emit('phase', phase);break;}
         case 3:
@@ -437,8 +437,8 @@ function phaseHandler(room, dead){
                     y++;
                 }
             }
-            for(var x in io.sockets.adapter.rooms[room].spawns){
-                var xx = io.sockets.adapter.rooms[room].spawns[x];
+            for(var x in io.sockets.adapter.rooms[room].Spawn){
+                var xx = io.sockets.adapter.rooms[room].Spawn[x];
                 if(xx!=false && io.sockets.sockets[xx].game.alive == true) {
                     z++;
                 }
@@ -446,7 +446,7 @@ function phaseHandler(room, dead){
             console.log(y+" Players alive");
             console.log(z+" Spawns alive");
             if(z == y){
-                cleanUp(room, 'spawns');
+                cleanUp(room, 'Spawn');
                 return false;
             } else {phase=1;io.to(room).emit('phase', phase);break;}
             break;
@@ -460,9 +460,9 @@ function phaseHandler(room, dead){
 function assignRoles(length, room) {
     var spawnCount = Math.ceil(length/4);
     var inspeCount = Math.ceil(length/8);
-    io.sockets.adapter.rooms[room].peasants = [];
-    io.sockets.adapter.rooms[room].inspectors = [];
-    io.sockets.adapter.rooms[room].spawns = [];
+    io.sockets.adapter.rooms[room].Peasant = [];
+    io.sockets.adapter.rooms[room].Inspector = [];
+    io.sockets.adapter.rooms[room].Spawn = [];
     var target;
     var targetArray = new Array(length);
     for (var x=0;x<spawnCount;x++){
@@ -481,13 +481,13 @@ function assignRoles(length, room) {
     for(var socketID in io.sockets.adapter.rooms[room].sockets){
         if(targetArray[z]=='Spawn'){
             io.sockets.sockets[socketID].game.role='Spawn';
-            io.sockets.adapter.rooms[room].spawns.push(socketID);
+            io.sockets.adapter.rooms[room].Spawn.push(socketID);
         } else if (targetArray[z]=='Inspector') {
             io.sockets.sockets[socketID].game.role='Inspector';
-            io.sockets.adapter.rooms[room].inspectors.push(socketID);
+            io.sockets.adapter.rooms[room].Inspector.push(socketID);
         } else {
             io.sockets.sockets[socketID].game.role='Peasant';
-            io.sockets.adapter.rooms[room].peasants.push(socketID);
+            io.sockets.adapter.rooms[room].Peasant.push(socketID);
         }
         z++;
     }
@@ -501,6 +501,9 @@ function cleanUp(room, winner){
         io.sockets.sockets[x].game.vote = false;
     }
     io.sockets.adapter.rooms[room].phase=undefined;
+    io.sockets.adapter.rooms[room].Peasant=undefined;
+    io.sockets.adapter.rooms[room].Inspector=undefined;
+    io.sockets.adapter.rooms[room].Spawn=undefined;
     console.log('And the winner is: '+winner);
     io.to(room).emit('end', winner);
 }
