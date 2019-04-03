@@ -120,8 +120,8 @@ io.on("connection", function(socket){
     });
     socket.on('disconnecting', function(){
         io.to(currentRoom).emit('discon message', socket.id);
+        checkForVote(currentRoom, io.sockets.adapter.rooms[currentRoom].phase);
         socket.leave(currentRoom);
-        //function to check the votes after someone dc'd
     });
     
     socket.on('chat message', function(msg){        //receive message and broadcast it
@@ -237,42 +237,19 @@ io.on("connection", function(socket){
             case 1:
                 if(socket.game.alive == true){
                     socket.game.vote = target;
-                    console.log(socket.game.vote);
-                    console.log("phase 1");
-                    result = checkForVote(currentRoom, 'peasants', 'single');
-                    console.log(result);
-                    if(result){
-                        io.sockets.sockets[result[0]].game.alive = false;
-                        io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
-                        phaseHandler(currentRoom, result);
-                    }
+                    checkForVote(currentRoom, 1);
                 }
                 break;
             case 2:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].inspectors.includes(socket.id)){
                     socket.game.vote = target;
-                    console.log("phase 2");
-                    result = checkForVote(currentRoom, 'inspectors', 'multi');
-                    console.log(result);
-                    if(result){
-                        for(var x in result){
-                            io.to(x).emit('reveil', { target: result[x], role: io.sockets.sockets[result[x]].game.role });
-                        }
-                        phaseHandler(currentRoom, false);
-                    }
+                    checkForVote(currentRoom, 2);
                 }
                 break;
             case 3:
                 if(socket.game.alive == true && io.sockets.adapter.rooms[currentRoom].spawns.includes(socket.id)){
                     socket.game.vote = target;
-                    console.log("phase 3");
-                    result = checkForVote (currentRoom, 'spawns', 'single');
-                    console.log(result);
-                    if(result){
-                        io.sockets.sockets[result[0]].game.alive = false;
-                        io.to(currentRoom).emit('reveil', {target: result[0], role: io.sockets.sockets[result[0]].game.role});
-                        phaseHandler(currentRoom, result);
-                    }
+                    checkForVote (currentRoom, 3);
                 }
                 break;
             default:
@@ -304,10 +281,28 @@ function checkForStart (room) {
     }
 }
 
-function checkForVote (room, role, response_type) {
+function checkForVote (room, phase) {
     var buffer = {};
     var x = 0;
     var y = 0;
+    var role;
+    var respone_type;
+    var flag=true;
+    switch(phase){
+        case 1:
+            role='peasants';
+            respone_type='single';
+            break;
+        case 2:
+            role='inspectors';
+            respone_type='mulit';
+            break;
+        case 3:
+            role='spawns';
+            respone_type='single';
+            break;
+            default('Critical Error!');
+    }
     console.log('checking for votes');
     if(role == 'peasants'){
         for (var z in io.sockets.adapter.rooms[room].sockets) {
@@ -331,38 +326,57 @@ function checkForVote (room, role, response_type) {
             }
         }
     }
-    if(x == y) {
-        switch(response_type){
-            case 'multi':
-                return buffer;
-            case 'single':
-                var modeMap = {};
-                var maxCount = 1;
-                var modes = [];
-                for(var i in buffer)
+    if(y==0){
+        phaseHandler(room, false);
+    } else if(x == y) {
+        if(response_type=='single'){
+            var modeMap = {};
+            var maxCount = 1;
+            var modes = [];
+            for(var i in buffer)
+            {
+                var el = buffer[i];
+                if (modeMap[el] == null)
+                    modeMap[el] = 1;
+                else
+                    modeMap[el]++;
+                if (modeMap[el] > maxCount)
                 {
-                    var el = buffer[i];
-                    if (modeMap[el] == null)
-                        modeMap[el] = 1;
-                    else
-                        modeMap[el]++;
-                    if (modeMap[el] > maxCount)
-                    {
-                        modes = [el];
-                        maxCount = modeMap[el];
-                    }
-                    else if (modeMap[el] == maxCount)
-                    {
-                        modes.push(el);
-                        maxCount = modeMap[el];
-                    }
+                    modes = [el];
+                    maxCount = modeMap[el];
                 }
-                if(modes.length == 1){
-                    return modes;
-                } else { phaseHandler(room, false); }
-                break;
-            default:
-                console.log('WOW!');
+                else if (modeMap[el] == maxCount)
+                {
+                    modes.push(el);
+                    maxCount = modeMap[el];
+                }
+            }
+            if(modes.length != 1){
+                phaseHandler(room, false);
+                flag=false;
+            }
+        }
+        if(flag){
+            switch(phase){
+                case 1:
+                    io.sockets.sockets[modes[0]].game.alive = false;
+                    io.to(room).emit('reveil', {target: modes[0], role: io.sockets.sockets[modes[0]].game.role});
+                    phaseHandler(room, modes);
+                    break;
+                case 2:
+                    for(var zzz in buffer){
+                        io.to(zzz).emit('reveil', {target: buffer[zzz], role: io.sockets.sockets[buffer[zzz]].game.role});
+                    }
+                    phaseHandler(room, false);
+                    break;
+                case 3:
+                    io.sockets.sockets[modes[0]].game.alive = false;
+                    io.to(room).emit('reveil', {target: modes[0], role: io.sockets.sockets[modes[0]].game.role});
+                    phaseHandler(room, modes);
+                    break;
+                default:
+                    console.log('Just how?');
+            }
         }
     }
 }
