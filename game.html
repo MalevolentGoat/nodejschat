@@ -204,7 +204,7 @@
         });
         socket.on('discon message', function(msg){
           $('#' + msg).remove(); 
-          document.getElementsByName(msg)[0].remove();
+          document.getElementsByName(msg)[0].remove();//but only if ingame
           $('#page').animate({scrollTop: $('#page').prop("scrollHeight")}, 10);
         });
         socket.on('room_list', function(list){
