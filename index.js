@@ -121,7 +121,8 @@ io.on("connection", function(socket){
     socket.on('disconnecting', function(){
         io.to(currentRoom).emit('discon message', socket.id);
         if(io.sockets.adapter.rooms[currentRoom].phase!=undefined){
-           checkForVote(currentRoom, io.sockets.adapter.rooms[currentRoom].phase);
+            io.sockets.adapter.rooms[currentRoom][socket.game.role]=io.sockets.adapter.rooms[currentRoom][socket.game.role].filter(item=>item!=socket.id);
+            checkForVote(currentRoom, io.sockets.adapter.rooms[currentRoom].phase);
         }
         socket.leave(currentRoom);
     });
@@ -395,9 +396,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var v in io.sockets.adapter.rooms[room].spawns){
                 var vv = io.sockets.adapter.rooms[room].spawns[v];
-                console.log(vv);
-                console.log(io.sockets.sockets[vv]);
-                if(vv!=false && io.sockets.sockets[vv].game.alive == true) {
+                if(io.sockets.sockets[vv].game.alive == true) {
                     y++;
                 }
             }
@@ -409,7 +408,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var x in io.sockets.adapter.rooms[room].inspectors){
                 var xx = io.sockets.adapter.rooms[room].inspectors[x];
-                if(xx!=false && io.sockets.sockets[xx].game.alive == true) {
+                if(io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
@@ -421,7 +420,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var x in io.sockets.adapter.rooms[room].spawns){
                 var xx = io.sockets.adapter.rooms[room].spawns[x];
-                if(xx!=false && io.sockets.sockets[xx].game.alive == true) {
+                if(io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
