@@ -384,7 +384,7 @@ function checkForVote (room, phase) {
                     console.log('Just how?');
             }
         }
-        if(io.sockets.adapter.rooms[room]['Spawn'].length==0){
+        if(io.sockets.adapter.rooms[room].Spawn.length==0){
             cleanUp(room, 'Peasant');
         }
     }
