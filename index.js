@@ -286,20 +286,20 @@ function checkForVote (room, phase) {
     var x = 0;
     var y = 0;
     var role;
-    var respone_type;
+    var response_type;
     var flag=true;
     switch(phase){
         case 1:
             role='peasants';
-            respone_type='single';
+            response_type='single';
             break;
         case 2:
             role='inspectors';
-            respone_type='mulit';
+            response_type='mulit';
             break;
         case 3:
             role='spawns';
-            respone_type='single';
+            response_type='single';
             break;
         default:
             console.log('Critical Error!');
