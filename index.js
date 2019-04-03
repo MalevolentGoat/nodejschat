@@ -395,6 +395,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var v in io.sockets.adapter.rooms[room].spawns){
                 var vv = io.sockets.adapter.rooms[room].spawns[v];
+                console.log(io.sockets.sockets[vv]);
                 if(vv!=false && io.sockets.sockets[vv].game.alive == true) {
                     y++;
                 }
