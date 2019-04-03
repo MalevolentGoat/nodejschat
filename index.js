@@ -120,7 +120,9 @@ io.on("connection", function(socket){
     });
     socket.on('disconnecting', function(){
         io.to(currentRoom).emit('discon message', socket.id);
-        checkForVote(currentRoom, io.sockets.adapter.rooms[currentRoom].phase);
+        if(io.sockets.adapter.rooms[currentRoom].phase!=undefined){
+           checkForVote(currentRoom, io.sockets.adapter.rooms[currentRoom].phase);
+        }
         socket.leave(currentRoom);
     });
     
