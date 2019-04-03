@@ -331,7 +331,6 @@ function checkForVote (room, phase) {
             }
         }
     }
-    console.log("x: " + x + " y: " + y);
     if(y==0){
         phaseHandler(room, false);
     } else if(x == y) {
@@ -384,6 +383,7 @@ function checkForVote (room, phase) {
                     console.log('Just how?');
             }
         }
+        console.log(io.sockets.adapter.rooms[room].Spawn.length);
         if(io.sockets.adapter.rooms[room].Spawn.length==0){
             cleanUp(room, 'Peasant');
         }
