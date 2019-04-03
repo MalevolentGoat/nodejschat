@@ -395,7 +395,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var v in io.sockets.adapter.rooms[room].spawns){
                 var vv = io.sockets.adapter.rooms[room].spawns[v];
-                if(io.sockets.sockets[vv].game.alive == true) {
+                if(vv!=false && io.sockets.sockets[vv].game.alive == true) {
                     y++;
                 }
             }
@@ -407,7 +407,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var x in io.sockets.adapter.rooms[room].inspectors){
                 var xx = io.sockets.adapter.rooms[room].inspectors[x];
-                if(io.sockets.sockets[xx].game.alive == true) {
+                if(xx!=false && io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
@@ -419,7 +419,7 @@ function phaseHandler(room, dead){
             y=0;
             for(var x in io.sockets.adapter.rooms[room].spawns){
                 var xx = io.sockets.adapter.rooms[room].spawns[x];
-                if(io.sockets.sockets[xx].game.alive == true) {
+                if(xx!=false && io.sockets.sockets[xx].game.alive == true) {
                     y++;
                 }
             }
@@ -438,7 +438,7 @@ function phaseHandler(room, dead){
             }
             for(var x in io.sockets.adapter.rooms[room].spawns){
                 var xx = io.sockets.adapter.rooms[room].spawns[x];
-                if(io.sockets.sockets[xx].game.alive == true) {
+                if(xx!=false && io.sockets.sockets[xx].game.alive == true) {
                     z++;
                 }
             }
