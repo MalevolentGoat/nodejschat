@@ -301,7 +301,8 @@ function checkForVote (room, phase) {
             role='spawns';
             respone_type='single';
             break;
-            default('Critical Error!');
+        default:
+            console.log('Critical Error!');
     }
     console.log('checking for votes');
     if(role == 'peasants'){
