@@ -10,7 +10,6 @@ var credentials = {
 	cert: certificate,
 	ca: ca
 };
-//TODO: anzeige wen man wählt / leave button / Phasen indikator
 var https       = require('https').Server(credentials, app);
 var http        = require('http');
 var io          = require('socket.io')(https);
@@ -299,7 +298,7 @@ function checkForVote (room, phase) {
             break;
         case 2:
             role='Inspector';
-            response_type='mulit';
+            response_type='multi';
             break;
         case 3:
             role='Spawn';
