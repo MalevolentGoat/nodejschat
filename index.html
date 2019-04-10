@@ -59,6 +59,13 @@
                 display: none;
                 width: 100px;
             }
+            label{
+                width: 150px;
+                display: block;
+            }
+            input{
+                width: 150px;
+            }
         </style>
         <script>
             function mouseOverEffect(elem) {
@@ -144,8 +151,8 @@
             <div class="modal-content">
                 <h1>Login:</h1>
                 <form action="/login" id="login_form" method="POST">
-                    <p>E-mail:<input type="text" name="email" id="login_email" required></p>
-                    <p>Password:<input type="password" name="pass" id="login_pass" autocomplete="off" required></p>
+                    <p><label for="email">E-mail:</label><input type="text" name="email" id="login_email" required></p>
+                    <p><label for="pass">Password:</label><input type="password" name="pass" id="login_pass" autocomplete="off" required></p>
                     <p><button type="submit" id="login_button">Login</button></p>
                 </form>
             </div>
@@ -154,9 +161,9 @@
             <div class="modal-content" id="register_form_div">
                 <h1>Register</h1>
                 <form action="/register" id="register_form" method="POST">
-                    <p>E-mail:<input type="text" name="email" id="register_email" required></p>
-                    <p>Username:<input type="text" name="name" id="register_name" required></p>
-                    <p>Password:<input type="password" name="pass" id="register_pass" required></p>
+                    <p><label for="email">E-mail:</label><input type="text" name="email" id="register_email" required></p>
+                    <p><label for="name">Username:</label><input type="text" name="name" id="register_name" required></p>
+                    <p><label for="pass">Password:</label><input type="password" name="pass" id="register_pass" required></p>
                     <p><button type="submit" id="register_button">Register</button></p>
                 </form>
             </div>
