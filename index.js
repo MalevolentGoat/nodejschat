@@ -145,6 +145,12 @@ io.on("connection", function(socket){
                         console.log(io.sockets.sockets[socketID].game);
                     }
                     break;
+                case '/db':
+                    con.query("SELECT name FROM `user`", function (err, result){
+                        try{if(err) {throw err;} else {
+                            console.log(result);
+                        }} catch(e) {res.sendStatus(400);console.log(e);}
+                    });
                 default:
                     io.to(socket.id).emit('chat message', 'invalid command');
             }
