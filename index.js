@@ -30,12 +30,10 @@ function handleDisconnect(){
     con = mysql.createConnection(con_config);
     con.connect( function onConnect(err){
         if (err) {
-            console.log("DBCONNECT_ERROR: ", err);
             setTimeout(handleDisconnect, 10000);
         }
     });
     con.on('error', function onError(err){
-        console.log('db error', err);
         if(err.code == 'PROTOCOL_CONNECTION_LOST'){
             handleDisconnect();
         } else {
@@ -63,7 +61,6 @@ app.post('/login', function (req, res){
                 var loggedIn=false;
                 for(var i in io.sockets.sockets) {
                     if(io.sockets.sockets[i].game.username==result[0].name){
-                        console.log(io.sockets.sockets[i].game.username);
                         loggedIn=true;
                         break;
                     }
@@ -99,7 +96,6 @@ io.on("connection", function(socket){
     socket.on('username', function(username) {
         var verifiedToken = jwt.verify(username, 'superSecretPassphrase');
         socket.game.username = verifiedToken.user;
-        console.log(socket.game.username);
         socket.join('Lobby', function(){
             currentRoom = 'Lobby';
             io.to(currentRoom).emit('con message', { msg: socket.game.username + ' has connected!', data: getUserlistInRoom(currentRoom)});
@@ -193,7 +189,6 @@ io.on("connection", function(socket){
                 list[x] = io.sockets.adapter.rooms[x].length;
             }
         }
-        console.log(list);
         socket.emit('room_list', list);
     });
     //room_create
@@ -313,7 +308,6 @@ function checkForVote (room, phase) {
         default:
             console.log('Critical Error!');
     }
-    console.log('checking for votes');
     if(role == 'Peasant'){
         for (var z in io.sockets.adapter.rooms[room].sockets) {
             if(io.sockets.sockets[z].game.alive == true) {
@@ -390,7 +384,6 @@ function checkForVote (room, phase) {
         }
     }
     if(io.sockets.adapter.rooms[room].Spawn!=undefined){
-        console.log(io.sockets.adapter.rooms[room].Spawn.length);
         if(io.sockets.adapter.rooms[room].Spawn.length==0){
             cleanUp(room, 'Peasant');
         }
@@ -412,7 +405,6 @@ function phaseHandler(room, dead){
                     y++;
                 }
             }
-            console.log(y+" Spawn alive");
             if(y==0){
                 cleanUp(room, 'Peasant');
                 return false;
@@ -424,7 +416,6 @@ function phaseHandler(room, dead){
                     y++;
                 }
             }
-            console.log(y+" Inspectors alive");
             if(y==0){
                 phase++;
             } else {phase++;io.to(room).emit('phase', phase);break;}
@@ -436,7 +427,6 @@ function phaseHandler(room, dead){
                     y++;
                 }
             }
-            console.log(y+"  alive");
             if(y==0){
                 cleanUp(room, 'Peasant');
                 return false;
@@ -455,8 +445,6 @@ function phaseHandler(room, dead){
                     z++;
                 }
             }
-            console.log(y+" Players alive");
-            console.log(z+" Spawns alive");
             if(z == y){
                 cleanUp(room, 'Spawn');
                 return false;
@@ -516,7 +504,6 @@ function cleanUp(room, winner){
     io.sockets.adapter.rooms[room].Peasant=undefined;
     io.sockets.adapter.rooms[room].Inspector=undefined;
     io.sockets.adapter.rooms[room].Spawn=undefined;
-    console.log('And the winner is: '+winner);
     io.to(room).emit('end', winner);
 }
 
